@@ -10,13 +10,13 @@ async def ollama_chat_text(
     model: str = Form(...),
     prompt: str = Form(...)
 ):
-    content = chat_text_only(
+    result = chat_text_only(
         model=model,
         prompt=prompt
     )
-    return {"content": content}
+    return result
 
-@router.post("/chat/images")
+@router.post("/images")
 async def ollama_chat_images(
     model: str = Form(...),
     prompt: str = Form(...),
@@ -31,31 +31,31 @@ async def ollama_chat_images(
 
         image_bytes_list.append(await img.read())
 
-    content = chat_with_images(
+    result = chat_with_images(
         model=model,
         prompt=prompt,
         images_bytes=image_bytes_list
     )
 
-    return {"content": content}
+    return result
 
 
 @router.post("/pdf")
 async def ollama_chat_pdf(
     model: str = Form(...),
     prompt: str = Form(...),
-    file: UploadFile = File(...)
+    pdf_file: UploadFile = File(...)
 ):
-    filename = file.filename or ""
+    filename = pdf_file.filename or ""
     if not filename.lower().endswith(".pdf"):
         raise HTTPException(400, "Only PDF files are supported")
 
-    pdf_bytes = await file.read()
+    pdf_bytes = await pdf_file.read()
 
-    content = chat_with_pdf(
+    result = chat_with_pdf(
         model=model,
         prompt=prompt,
         pdf_bytes=pdf_bytes
     )
 
-    return {"content": content}
+    return result
