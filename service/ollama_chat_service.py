@@ -1,33 +1,35 @@
-from typing import List,Optional,Dict, Any
+from typing import List,Optional,Dict, Any,Type
 from fastapi import HTTPException
 import requests
 from util.pdf_utils import pdf_bytes_to_base64_images,image_bytes_to_base64
+from pydantic import BaseModel
+from schemas.registry import SCHEMA_REGISTRY
 
-def chat_text_only(model: str, prompt: str) -> str:
+
+
+def chat_text_only(model: str, prompt: str,schema_name: str) -> BaseModel:
     return _call_ollama(
         model=model,
-        prompt=prompt
+        prompt=prompt,
+        schema_name=schema_name
     )
 
-def chat_with_images(
-    model: str,
-    prompt: str,
-    images_bytes: List[bytes]
-) -> str:
-    if not images_bytes:
+def chat_with_images(model: str,prompt: str,schema_name: str,images: List[bytes]) -> BaseModel:
+    if not images:
         raise HTTPException(400, "images is required")
 
-    images_b64 = [
-        image_bytes_to_base64(b) for b in images_bytes
+    images_bytes = [
+        image_bytes_to_base64(b) for b in images
     ]
 
     return _call_ollama(
         model=model,
         prompt=prompt,
-        images=images_b64
+        schema_name=schema_name,
+        images_bytes=images_bytes
     )
 
-def chat_with_pdf(model: str, prompt: str, pdf_bytes: bytes) -> str:
+def chat_with_pdf(model: str, prompt: str, schema_name: str,pdf_bytes: bytes) -> BaseModel:
     images_bytes = pdf_bytes_to_base64_images(pdf_bytes)
 
     if not images_bytes:
@@ -36,40 +38,47 @@ def chat_with_pdf(model: str, prompt: str, pdf_bytes: bytes) -> str:
     return _call_ollama(
         model=model,
         prompt=prompt,
-        images=images_bytes
+        schema_name=schema_name,
+        images_bytes=images_bytes
     )
 
 def _call_ollama(
     model: str,
     prompt: str,
-    images: Optional[List[str]] = None
-) -> str:
+    schema_name: str,
+    images_bytes: Optional[List[str]] = None
+) -> BaseModel:
     """
     Ollama 统一调用入口
     """
+    
     message: Dict[str, Any] = {
         "role": "user",
         "content": prompt,
     }
 
-    if images:
-        message["images"] = images
+    Schema = SCHEMA_REGISTRY.get(schema_name)
+    if not Schema:
+        raise HTTPException(400, f"Unknown schema: {schema_name}")
+
+    if images_bytes:
+        message["images"] = images_bytes
 
     payload = {
         "model": model,
         "messages": [message],
         "stream": False,
+        "format":Schema.model_json_schema()
     }
 
     try:
         resp = requests.post(
             "http://localhost:8001/api/chat",
             json=payload,
-            timeout=300
+            timeout=100,
         )
         resp.raise_for_status()
     except requests.RequestException as e:
-        raise HTTPException(502, f"Ollama request failed: {e}")
+        raise HTTPException(502, f"推理超时，更换提示词试试")
 
-    return resp.json()["message"]["content"]
-
+    return Schema.model_validate_json(resp.json()["message"]["content"])
