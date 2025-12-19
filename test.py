@@ -7,7 +7,7 @@ class Book(BaseModel):
     name: str
     time: str
 
-user_prompt = "你是一个专著内容提取小助手"
+user_prompt = "你是一个专著内容提取小助手。"
 url = "http://localhost:8001/api/chat"
 
 with open("assets/专著-热带作物发展史（肉桂发展史）.pdf", "rb") as f:
@@ -24,6 +24,7 @@ payload = {
          }
     ],
     "stream": False,
+    # 强束缚，对提示词有要求，不然会卡死
     "format":Book.model_json_schema()
 }
 

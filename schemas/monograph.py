@@ -1,5 +1,9 @@
 from pydantic import BaseModel
 
 class MonoGraph(BaseModel):
-    name: str
-    time: str
+    monograph_name: str  = ""
+    press: str  = ""
+    publication_time: str  = ""
+    ISBN: str  = ""
+    word_count: str  = ""
+
