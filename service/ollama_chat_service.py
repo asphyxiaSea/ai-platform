@@ -57,6 +57,7 @@ def _call_ollama(
         "content": prompt,
     }
 
+    # 获取类
     Schema = SCHEMA_REGISTRY.get(schema_name)
     if not Schema:
         raise HTTPException(400, f"Unknown schema: {schema_name}")
@@ -68,6 +69,13 @@ def _call_ollama(
         "model": model,
         "messages": [message],
         "stream": False,
+        # ollama强束缚，对提示词有要求，不然会卡死
+        # 为什么 OpenAI 的 Structured Outputs 不会这样？
+            # 这是非常关键的区别 👇
+            # OpenAI Structured Outputs（Responses API）
+            # 不是靠模型“硬想JSON”
+            # 是先生成结构化token
+            # 再在系统层保证合法性
         "format":Schema.model_json_schema()
     }
 
@@ -80,5 +88,5 @@ def _call_ollama(
         resp.raise_for_status()
     except requests.RequestException as e:
         raise HTTPException(502, f"推理超时，更换提示词试试")
-
+    print(Schema.model_validate_json(resp.json()["message"]["content"]))
     return Schema.model_validate_json(resp.json()["message"]["content"])
