@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual env
+.venv/
+venv/
+env/
+
+# Model / OCR / LLM 权重（你这个项目很重要）
+models/
+*.bin
+*.safetensors
+*.pt
+*.pth
+
+# Marker / Surya / OCR cache
+.cache/
+.datalab/
+surya_cache/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# VSCode 本地配置（一般不提交）
+.vscode/
