@@ -30,3 +30,5 @@ Thumbs.db
 
 # VSCode 本地配置（一般不提交）
 .vscode/
+
+/marker_model
