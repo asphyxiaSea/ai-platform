@@ -1,6 +1,6 @@
-FROM python:3.9-slim
+FROM python:3.11-slim
 
-WORKDIR /ollama
+WORKDIR /ollama_api
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir \

@@ -5,16 +5,7 @@ from util.pdf_utils import pdf_bytes_to_base64_images,image_bytes_to_base64
 from pydantic import BaseModel
 from schemas.registry import SCHEMA_REGISTRY
 
-
-
-def chat_text_only(model: str, prompt: str,schema_name: str) -> BaseModel:
-    return _call_ollama(
-        model=model,
-        prompt=prompt,
-        schema_name=schema_name
-    )
-
-def chat_with_images(model: str,prompt: str,schema_name: str,images: List[bytes]) -> BaseModel:
+def chat_multimodal_images_services(model: str,prompt: str,schema_name: str,images: List[bytes]) -> BaseModel:
     if not images:
         raise HTTPException(400, "images is required")
 
@@ -22,27 +13,38 @@ def chat_with_images(model: str,prompt: str,schema_name: str,images: List[bytes]
         image_bytes_to_base64(b) for b in images
     ]
 
-    return _call_ollama(
+    return _call_multimodal_ollama(
         model=model,
         prompt=prompt,
         schema_name=schema_name,
         images_bytes=images_bytes
     )
 
-def chat_with_pdf(model: str, prompt: str, schema_name: str,pdf_bytes: bytes) -> BaseModel:
-    images_bytes = pdf_bytes_to_base64_images(pdf_bytes)
 
-    if not images_bytes:
-        raise HTTPException(400, "PDF contains no pages")
+def chat_multimodal_pdfs_services(
+    model: str,
+    prompt: str,
+    schema_name: str,
+    pdf_bytes_list: List[bytes]
+) -> BaseModel:
 
-    return _call_ollama(
+    all_images_bytes = []
+
+    for idx, pdf_bytes in enumerate(pdf_bytes_list):
+        images_bytes = pdf_bytes_to_base64_images(pdf_bytes)
+
+        # 合并所有 PDF 的图片
+        all_images_bytes.extend(images_bytes)
+
+    return _call_multimodal_ollama(
         model=model,
         prompt=prompt,
         schema_name=schema_name,
-        images_bytes=images_bytes
+        images_bytes=all_images_bytes
     )
 
-def _call_ollama(
+# 多模态调用ollama
+def _call_multimodal_ollama(
     model: str,
     prompt: str,
     schema_name: str,
@@ -88,5 +90,4 @@ def _call_ollama(
         resp.raise_for_status()
     except requests.RequestException as e:
         raise HTTPException(502, f"推理超时，更换提示词试试")
-    print(Schema.model_validate_json(resp.json()["message"]["content"]))
     return Schema.model_validate_json(resp.json()["message"]["content"])

@@ -1,38 +1,23 @@
-import requests
-from util.pdf_utils import pdf_bytes_to_base64_images
+from marker.output import text_from_rendered
+from util.mark_pdf import CONVERTER
+from io import BytesIO
 
-from pydantic import BaseModel, Field
+pdf_path = "assets/桉树人工林土壤质量演变与提升关键技术——获奖个人证书.pdf"
 
-class Book(BaseModel):
-    name: str
-    time: str
-
-user_prompt = "你是一个专著内容提取小助手。"
-url = "http://localhost:8001/api/chat"
-
-with open("assets/专著-热带作物发展史（肉桂发展史）.pdf", "rb") as f:
+with open(pdf_path, "rb") as f:
     pdf_bytes = f.read()
 
-images_bytes = pdf_bytes_to_base64_images(pdf_bytes)
-
-payload = {
-    "model": "qwen2.5vl:7b",
-    "messages": [
-        {"role": "user", 
-         "content": user_prompt,
-         "images" : images_bytes
-         }
-    ],
-    "stream": False,
-    # 强束缚，对提示词有要求，不然会卡死
-    "format":Book.model_json_schema()
-}
+pdf_stream = BytesIO(pdf_bytes)
 
 
-resp = requests.post(url, json=payload, timeout=300)
-resp.raise_for_status()
+# 3. 初始化转换器
+# 你可以在这里指定语言
 
-content = resp.json()["message"]["content"]
+# 4. 执行转换
+rendered = CONVERTER(pdf_stream)
 
-book = Book.model_validate_json(content)
-print(book)
+# 5. 提取文本内容
+full_text, _, _ = text_from_rendered(rendered)
+
+print(full_text)
+

@@ -4,6 +4,7 @@ from typing import List
 from pdf2image import convert_from_bytes
 from PIL import Image
 
+
 def pil_to_base64(img: Image.Image) -> str:
     buf = io.BytesIO()
     img.save(buf, format="JPEG", quality=85)

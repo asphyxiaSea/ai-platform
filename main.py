@@ -1,10 +1,12 @@
 from fastapi import FastAPI
 import uvicorn
-from router.ollama import router as ollama_router
+from router.multimodal import router as multimodal_router
+from router.texts import router as texts_router
 
 app = FastAPI(title="Ollama API")
 
-app.include_router(ollama_router)
+app.include_router(multimodal_router)
+app.include_router(texts_router)
 
 if __name__ == "__main__":
     uvicorn.run(

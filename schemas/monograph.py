@@ -6,4 +6,3 @@ class MonoGraph(BaseModel):
     publication_time: str  = ""
     ISBN: str  = ""
     word_count: str  = ""
-

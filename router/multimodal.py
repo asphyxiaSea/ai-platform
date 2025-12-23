@@ -2,26 +2,12 @@ from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from typing import List
 from schemas.registry import SCHEMA_REGISTRY
 
-from service.ollama_chat_service import chat_with_pdf,chat_text_only,chat_with_images
+from service.multimodal_service import chat_multimodal_pdfs_services,chat_multimodal_images_services
 
-router = APIRouter(prefix="/ollama_api/chat", tags=["ollama"])
-
-@router.post("/text")
-async def ollama_chat_text(
-    model: str = Form(...),
-    prompt: str = Form(...),
-    schema_name: str = Form(...),
-):
-
-    result = chat_text_only(
-        model=model,
-        prompt=prompt,
-        schema_name=schema_name
-    )
-    return result
+router = APIRouter(prefix="/ollama_api/chat/multimodal", tags=["ollama"])
 
 @router.post("/images")
-async def ollama_chat_images(
+async def chat_multimodal_images(
     model: str = Form(...),
     prompt: str = Form(...),
     schema_name: str = Form(...),
@@ -37,7 +23,7 @@ async def ollama_chat_images(
 
         image.append(await img.read())
 
-    result = chat_with_images(
+    result = chat_multimodal_images_services(
         model=model,
         prompt=prompt,
         schema_name=schema_name,
@@ -47,25 +33,31 @@ async def ollama_chat_images(
     return result
 
 
-@router.post("/pdf")
-async def ollama_chat_pdf(
+@router.post("/pdfs")
+async def chat_multimodal_pdfs(
     model: str = Form(...),
     prompt: str = Form(...),
     schema_name: str = Form(...),
-    pdf_file: UploadFile = File(...)
+    pdf_files: List[UploadFile] = File(...)
 ):
+    pdf_bytes_list = []
 
-    filename = pdf_file.filename or ""
-    if not filename.lower().endswith(".pdf"):
-        raise HTTPException(400, "Only PDF files are supported")
+    for pdf_file in pdf_files:
+        filename = pdf_file.filename or ""
+        if not filename.lower().endswith(".pdf"):
+            raise HTTPException(
+                status_code=400,
+                detail=f"Only PDF files are supported: {filename}"
+            )
 
-    pdf_bytes = await pdf_file.read()
+        pdf_bytes = await pdf_file.read()
+        pdf_bytes_list.append(pdf_bytes)
 
-    result = chat_with_pdf(
+    result = chat_multimodal_pdfs_services(
         model=model,
         prompt=prompt,
         schema_name=schema_name,
-        pdf_bytes=pdf_bytes
+        pdf_bytes_list=pdf_bytes_list
     )
 
     return result

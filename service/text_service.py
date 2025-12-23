@@ -1,0 +1,80 @@
+from typing import List
+from fastapi import HTTPException
+import requests
+from pydantic import BaseModel
+from schemas.registry import SCHEMA_REGISTRY
+
+from marker.output import text_from_rendered
+from util.mark_pdf import CONVERTER
+from io import BytesIO
+
+def chat_texts_pdfs_services(
+    model: str,
+    prompt: str,
+    schema_name: str,
+    pdf_bytes_list: List[bytes]
+) -> BaseModel:
+
+    texts = []
+
+    for idx, pdf_bytes in enumerate(pdf_bytes_list):
+        rendered = CONVERTER(BytesIO(pdf_bytes))
+        full_text, _, _ = text_from_rendered(rendered)
+
+        texts.append(f"【PDF {idx+1}】\n{full_text}")
+
+    merged_text = "\n\n".join(texts)
+    print(merged_text)
+    return _call_ollama(
+        model=model,
+        prompt=prompt,
+        schema_name=schema_name,
+        texts=merged_text
+    )
+
+
+def _call_ollama(
+    model: str,
+    prompt: str,
+    schema_name: str,
+    texts: str
+) -> BaseModel:
+    
+    Schema = SCHEMA_REGISTRY.get(schema_name)
+    if not Schema:
+        raise HTTPException(400, f"Unknown schema: {schema_name}")
+
+    # 1️⃣ 构造强约束 Prompt（关键）
+    full_prompt = f"""
+你是一个只输出 JSON 的程序。
+你必须严格按照给定的 JSON Schema 输出结果。
+不要输出任何解释、说明、Markdown 或多余文本。
+不要输出 Schema 中未定义的字段。
+
+【任务说明】
+{prompt}
+
+【文档内容】
+{texts}
+"""
+
+    messages = [{"role": "user","content": full_prompt}]
+
+    payload = {
+        "model": model,
+        "messages": messages,
+        "stream": False,
+        "format": Schema.model_json_schema()
+    }
+
+    try:
+        resp = requests.post(
+            "http://localhost:8001/api/chat",
+            json=payload,
+            timeout=100,
+        )
+        resp.raise_for_status()
+    except requests.RequestException:
+        raise HTTPException(502, "推理超时或 Ollama 服务异常")
+
+    return Schema.model_validate_json(resp.json()["message"]["content"])
