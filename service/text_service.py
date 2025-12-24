@@ -9,7 +9,6 @@ from util.mark_pdf import CONVERTER
 from io import BytesIO
 
 def chat_texts_pdfs_services(
-    model: str,
     schema_name: str,
     pdf_bytes_list: List[bytes]
 ) -> BaseModel:
@@ -25,38 +24,31 @@ def chat_texts_pdfs_services(
     merged_text = "\n\n".join(texts)
     
     return _call_ollama(
-        model=model,
         schema_name=schema_name,
         texts=merged_text
     )
 
 
 def _call_ollama(
-    model: str,
     schema_name: str,
     texts: str
 ) -> BaseModel:
-    
-    Schema = SCHEMA_REGISTRY.get(schema_name)
-    if not Schema:
+
+    schema = SCHEMA_REGISTRY[schema_name].schema
+    if not schema:
         raise HTTPException(400, f"Unknown schema: {schema_name}")
 
     field_prompts = "\n".join(
         f"- {name}: {field.description}"
-        for name, field in Schema.model_fields.items()
+        for name, field in schema.model_fields.items()
 )
-    task_description = (Schema.__doc__ or "").strip()
+    task_description = (schema.__doc__ or "").strip()
 
-
-    # 1️⃣ 构造强约束 Prompt（关键）
     full_prompt = f"""
-    
 [任务说明]
 {task_description}
-
 [字段提示]
 {field_prompts}
-
 [文档内容]
 {texts}
 """
@@ -64,10 +56,12 @@ def _call_ollama(
     messages = [{"role": "user","content": full_prompt}]
 
     payload = {
-        "model": model,
+        "model": SCHEMA_REGISTRY[schema_name].model,
         "messages": messages,
         "stream": False,
-        "format": Schema.model_json_schema()
+        "temperature":SCHEMA_REGISTRY[schema_name].temperature,
+        # ollama强束缚,保证输出合法性
+        "format": schema.model_json_schema()
     }
 
     try:
@@ -80,4 +74,4 @@ def _call_ollama(
     except requests.RequestException:
         raise HTTPException(502, "推理超时或 Ollama 服务异常")
 
-    return Schema.model_validate_json(resp.json()["message"]["content"])
+    return schema.model_validate_json(resp.json()["message"]["content"])

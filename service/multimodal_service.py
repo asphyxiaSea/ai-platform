@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from schemas.registry import SCHEMA_REGISTRY
 import requests
 
-def chat_multimodal_images_services(model: str,schema_name: str,images: List[bytes]) -> BaseModel:
+def chat_multimodal_images_services(schema_name: str,images: List[bytes]) -> BaseModel:
     if not images:
         raise HTTPException(400, "images is required")
 
@@ -14,14 +14,12 @@ def chat_multimodal_images_services(model: str,schema_name: str,images: List[byt
     ]
 
     return _call_multimodal_ollama(
-        model=model,
         schema_name=schema_name,
         images_bytes=images_bytes
     )
 
 
 def chat_multimodal_pdfs_services(
-    model: str,
     schema_name: str,
     pdf_bytes_list: List[bytes]
 ) -> BaseModel:
@@ -35,36 +33,31 @@ def chat_multimodal_pdfs_services(
         all_images_bytes.extend(images_bytes)
 
     return _call_multimodal_ollama(
-        model=model,
         schema_name=schema_name,
         images_bytes=all_images_bytes
     )
 
 # 多模态调用ollama
 def _call_multimodal_ollama(
-    model: str,
     schema_name: str,
     images_bytes: Optional[List[str]] = None
 ) -> BaseModel:
 
     # 获取类
-    Schema = SCHEMA_REGISTRY.get(schema_name)
-    if not Schema:
+    schema = SCHEMA_REGISTRY[schema_name].schema
+    if not schema:
         raise HTTPException(400, f"Unknown schema: {schema_name}")
 
     field_prompts = "\n".join(
         f"- {name}: {field.description}"
-        for name, field in Schema.model_fields.items()
+        for name, field in schema.model_fields.items()
     )
 
-    task_description = (Schema.__doc__ or "").strip()
+    task_description = (schema.__doc__ or "").strip()
 
-    # 1️⃣ 构造强约束 Prompt（关键）
     full_prompt = f"""
-
 [任务说明]
 {task_description}
-
 [字段提示]
 {field_prompts}
 """
@@ -78,17 +71,12 @@ def _call_multimodal_ollama(
         message["images"] = images_bytes
 
     payload = {
-        "model": model,
+        "model": SCHEMA_REGISTRY[schema_name].model,
         "messages": [message],
         "stream": False,
-        # ollama强束缚，对提示词有要求，不然会卡死
-        # 为什么 OpenAI 的 Structured Outputs 不会这样？
-            # 这是非常关键的区别 👇
-            # OpenAI Structured Outputs（Responses API）
-            # 不是靠模型“硬想JSON”
-            # 是先生成结构化token
-            # 再在系统层保证合法性
-        "format":Schema.model_json_schema()
+        "temperature":SCHEMA_REGISTRY[schema_name].temperature,
+        # ollama强束缚,保证输出合法性
+        "format":schema.model_json_schema()
     }
 
     try:
@@ -100,4 +88,4 @@ def _call_multimodal_ollama(
         resp.raise_for_status()
     except requests.RequestException as e:
         raise HTTPException(502, "推理超时或 Ollama 服务异常")
-    return Schema.model_validate_json(resp.json()["message"]["content"])
+    return schema.model_validate_json(resp.json()["message"]["content"])

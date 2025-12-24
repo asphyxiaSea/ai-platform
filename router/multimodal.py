@@ -7,7 +7,6 @@ router = APIRouter(prefix="/ollama_api/chat/multimodal", tags=["ollama"])
 
 @router.post("/images")
 async def chat_multimodal_images(
-    model: str = Form(...),
     schema_name: str = Form(...),
     images: List[UploadFile] = File(...)
 ):
@@ -22,7 +21,6 @@ async def chat_multimodal_images(
         image.append(await img.read())
 
     result = chat_multimodal_images_services(
-        model=model,
         schema_name=schema_name,
         images=image
     )
@@ -32,7 +30,6 @@ async def chat_multimodal_images(
 
 @router.post("/pdfs")
 async def chat_multimodal_pdfs(
-    model: str = Form(...),
     schema_name: str = Form(...),
     pdf_files: List[UploadFile] = File(...)
 ):
@@ -50,7 +47,6 @@ async def chat_multimodal_pdfs(
         pdf_bytes_list.append(pdf_bytes)
 
     result = chat_multimodal_pdfs_services(
-        model=model,
         schema_name=schema_name,
         pdf_bytes_list=pdf_bytes_list
     )
