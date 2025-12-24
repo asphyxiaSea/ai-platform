@@ -10,4 +10,3 @@ class NewVarieties(BaseModel):
     breeders:str=""
     attachments:str=""
     review_process_records:str=""
-

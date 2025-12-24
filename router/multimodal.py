@@ -1,6 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from typing import List
-from schemas.registry import SCHEMA_REGISTRY
 
 from service.multimodal_service import chat_multimodal_pdfs_services,chat_multimodal_images_services
 
@@ -9,7 +8,6 @@ router = APIRouter(prefix="/ollama_api/chat/multimodal", tags=["ollama"])
 @router.post("/images")
 async def chat_multimodal_images(
     model: str = Form(...),
-    prompt: str = Form(...),
     schema_name: str = Form(...),
     images: List[UploadFile] = File(...)
 ):
@@ -25,7 +23,6 @@ async def chat_multimodal_images(
 
     result = chat_multimodal_images_services(
         model=model,
-        prompt=prompt,
         schema_name=schema_name,
         images=image
     )
@@ -36,7 +33,6 @@ async def chat_multimodal_images(
 @router.post("/pdfs")
 async def chat_multimodal_pdfs(
     model: str = Form(...),
-    prompt: str = Form(...),
     schema_name: str = Form(...),
     pdf_files: List[UploadFile] = File(...)
 ):
@@ -55,7 +51,6 @@ async def chat_multimodal_pdfs(
 
     result = chat_multimodal_pdfs_services(
         model=model,
-        prompt=prompt,
         schema_name=schema_name,
         pdf_bytes_list=pdf_bytes_list
     )

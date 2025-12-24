@@ -1,11 +1,11 @@
-from typing import List,Optional,Dict, Any,Type
+from typing import List,Optional,Dict, Any
 from fastapi import HTTPException
-import requests
 from util.pdf_utils import pdf_bytes_to_base64_images,image_bytes_to_base64
 from pydantic import BaseModel
 from schemas.registry import SCHEMA_REGISTRY
+import requests
 
-def chat_multimodal_images_services(model: str,prompt: str,schema_name: str,images: List[bytes]) -> BaseModel:
+def chat_multimodal_images_services(model: str,schema_name: str,images: List[bytes]) -> BaseModel:
     if not images:
         raise HTTPException(400, "images is required")
 
@@ -15,7 +15,6 @@ def chat_multimodal_images_services(model: str,prompt: str,schema_name: str,imag
 
     return _call_multimodal_ollama(
         model=model,
-        prompt=prompt,
         schema_name=schema_name,
         images_bytes=images_bytes
     )
@@ -23,7 +22,6 @@ def chat_multimodal_images_services(model: str,prompt: str,schema_name: str,imag
 
 def chat_multimodal_pdfs_services(
     model: str,
-    prompt: str,
     schema_name: str,
     pdf_bytes_list: List[bytes]
 ) -> BaseModel:
@@ -38,7 +36,6 @@ def chat_multimodal_pdfs_services(
 
     return _call_multimodal_ollama(
         model=model,
-        prompt=prompt,
         schema_name=schema_name,
         images_bytes=all_images_bytes
     )
@@ -46,23 +43,36 @@ def chat_multimodal_pdfs_services(
 # 多模态调用ollama
 def _call_multimodal_ollama(
     model: str,
-    prompt: str,
     schema_name: str,
     images_bytes: Optional[List[str]] = None
 ) -> BaseModel:
-    """
-    Ollama 统一调用入口
-    """
-    
-    message: Dict[str, Any] = {
-        "role": "user",
-        "content": prompt,
-    }
 
     # 获取类
     Schema = SCHEMA_REGISTRY.get(schema_name)
     if not Schema:
         raise HTTPException(400, f"Unknown schema: {schema_name}")
+
+    field_prompts = "\n".join(
+        f"- {name}: {field.description}"
+        for name, field in Schema.model_fields.items()
+    )
+
+    task_description = (Schema.__doc__ or "").strip()
+
+    # 1️⃣ 构造强约束 Prompt（关键）
+    full_prompt = f"""
+
+[任务说明]
+{task_description}
+
+[字段提示]
+{field_prompts}
+"""
+    
+    message: Dict[str, Any] = {
+        "role": "user",
+        "content": full_prompt,
+    }
 
     if images_bytes:
         message["images"] = images_bytes
@@ -89,5 +99,5 @@ def _call_multimodal_ollama(
         )
         resp.raise_for_status()
     except requests.RequestException as e:
-        raise HTTPException(502, f"推理超时，更换提示词试试")
+        raise HTTPException(502, "推理超时或 Ollama 服务异常")
     return Schema.model_validate_json(resp.json()["message"]["content"])

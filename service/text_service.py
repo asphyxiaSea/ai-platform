@@ -10,7 +10,6 @@ from io import BytesIO
 
 def chat_texts_pdfs_services(
     model: str,
-    prompt: str,
     schema_name: str,
     pdf_bytes_list: List[bytes]
 ) -> BaseModel:
@@ -27,7 +26,6 @@ def chat_texts_pdfs_services(
     
     return _call_ollama(
         model=model,
-        prompt=prompt,
         schema_name=schema_name,
         texts=merged_text
     )
@@ -35,7 +33,6 @@ def chat_texts_pdfs_services(
 
 def _call_ollama(
     model: str,
-    prompt: str,
     schema_name: str,
     texts: str
 ) -> BaseModel:
@@ -44,20 +41,26 @@ def _call_ollama(
     if not Schema:
         raise HTTPException(400, f"Unknown schema: {schema_name}")
 
+    field_prompts = "\n".join(
+        f"- {name}: {field.description}"
+        for name, field in Schema.model_fields.items()
+)
+    task_description = (Schema.__doc__ or "").strip()
+
+
     # 1️⃣ 构造强约束 Prompt（关键）
     full_prompt = f"""
-你是一个只输出 JSON 的程序。
-你必须严格按照给定的 JSON Schema 输出结果。
-不要输出任何解释、说明、Markdown 或多余文本。
-不要输出 Schema 中未定义的字段。
+    
+[任务说明]
+{task_description}
 
-【任务说明】
-{prompt}
+[字段提示]
+{field_prompts}
 
-【文档内容】
+[文档内容]
 {texts}
 """
-
+    
     messages = [{"role": "user","content": full_prompt}]
 
     payload = {

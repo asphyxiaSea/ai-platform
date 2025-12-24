@@ -8,7 +8,6 @@ router = APIRouter(prefix="/ollama_api/chat/texts", tags=["ollama"])
 @router.post("/pdfs")
 async def chat_multimodal_pdfs(
     model: str = Form(...),
-    prompt: str = Form(...),
     schema_name: str = Form(...),
     pdf_files: List[UploadFile] = File(...)
 ):
@@ -27,7 +26,6 @@ async def chat_multimodal_pdfs(
 
     result = chat_texts_pdfs_services(
         model=model,
-        prompt=prompt,
         schema_name=schema_name,
         pdf_bytes_list=pdf_bytes_list
     )
