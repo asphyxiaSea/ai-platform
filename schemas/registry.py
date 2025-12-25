@@ -4,6 +4,7 @@ from .linke.patent import Patent
 from .linke.new_varieties import NewVarieties
 from .linke.software_writings import SoftwareWritings
 from .linke.research_awards import ResearchAwards
+from .linke.paper import Paper
 from .taskconfig import TaskConfig
 
 SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
@@ -25,6 +26,10 @@ SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     ),
     "ResearchAwards": TaskConfig(
         schema=ResearchAwards,
+        model="gemma3:latest",
+    ),
+    "Paper": TaskConfig(
+        schema=Paper,
         model="gemma3:latest",
     ),
 }

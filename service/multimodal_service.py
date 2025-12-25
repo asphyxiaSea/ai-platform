@@ -5,12 +5,12 @@ from pydantic import BaseModel
 from schemas.registry import SCHEMA_REGISTRY
 import requests
 
-def chat_multimodal_images_services(schema_name: str,images: List[bytes]) -> BaseModel:
-    if not images:
-        raise HTTPException(400, "images is required")
+def chat_multimodal_images_services(schema_name: str,image_bytes: List[bytes]) -> BaseModel:
+    if not image_bytes:
+        raise HTTPException(400, "image_bytes is required")
 
     images_bytes = [
-        image_bytes_to_base64(b) for b in images
+        image_bytes_to_base64(b) for b in image_bytes
     ]
 
     return _call_multimodal_ollama(

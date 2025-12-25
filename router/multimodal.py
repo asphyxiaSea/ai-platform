@@ -8,21 +8,21 @@ router = APIRouter(prefix="/ollama_api/chat/multimodal", tags=["ollama"])
 @router.post("/images")
 async def chat_multimodal_images(
     schema_name: str = Form(...),
-    images: List[UploadFile] = File(...)
+    image_files: List[UploadFile] = File(...)
 ):
 
-    image: List[bytes] = []
+    image_bytes: List[bytes] = []
 
-    for img in images:
+    for img in image_files:
         content_type = img.content_type
         if not content_type or not content_type.startswith("image/"):
             raise HTTPException(400, f"{img.filename} is not an image")
 
-        image.append(await img.read())
+        image_bytes.append(await img.read())
 
     result = chat_multimodal_images_services(
         schema_name=schema_name,
-        images=image
+        image_bytes=image_bytes
     )
 
     return result

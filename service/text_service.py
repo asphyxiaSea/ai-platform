@@ -22,7 +22,6 @@ def chat_texts_pdfs_services(
         texts.append(f"【PDF {idx+1}】\n{full_text}")
 
     merged_text = "\n\n".join(texts)
-    
     return _call_ollama(
         schema_name=schema_name,
         texts=merged_text
