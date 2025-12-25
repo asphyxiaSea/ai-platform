@@ -7,7 +7,7 @@ class TaskConfig:
         schema: Type[BaseModel],
         model: str,
         # 模型保守程度，越高越不保守
-        temperature: float = 0.1,
+        temperature: float = 0.0,
         max_tokens: int = 2048,
     ):
         self.schema = schema

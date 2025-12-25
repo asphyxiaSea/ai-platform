@@ -3,7 +3,7 @@ from typing import List
 
 class NewVarieties(BaseModel):
     """
-    你是一个新品种信息结构化抽取助手。
+    你是一个中文新品种信息结构化抽取助手。
     不要输出任何解释、说明、Markdown 或多余文本。
     不要输出 Schema 中未定义的字段。
     """
@@ -25,12 +25,12 @@ class NewVarieties(BaseModel):
 
     application_date: str = Field(
         "",
-        description="申请日期,例如:2022年3月、2022-03-15"
+        description="申请日期,输出格式如：2022-03-15、2022-03"
     )
 
     grant_date: str = Field(
         "",
-        description="授权日期,例如:2023年6月;未授权则为空字符串"
+        description="授权日期,输出格式如：2022-03-15、2022-03;未授权则为空字符串"
     )
 
     variety_right_holder: str = Field(

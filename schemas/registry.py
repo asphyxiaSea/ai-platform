@@ -17,7 +17,7 @@ SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     ),
     "NewVarieties": TaskConfig(
         schema=NewVarieties,
-        model="qwen2.5vl:7b",
+        model="qwen3-vl:latest",
     ),
     "SoftwareWritings": TaskConfig(
         schema=SoftwareWritings,
