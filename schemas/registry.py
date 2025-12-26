@@ -5,31 +5,36 @@ from .linke.new_varieties import NewVarieties
 from .linke.software_writings import SoftwareWritings
 from .linke.research_awards import ResearchAwards
 from .linke.paper import Paper
-from .taskconfig import TaskConfig
+from .linke.improved_variety import ImprovedVariety
+from .linke.standard import Standard
+from .taskconfig import TaskConfig, InputMode
 
 SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     "Patent": TaskConfig(
         schema=Patent,
-        model="gemma3:latest",
     ),
     "MonoGraph": TaskConfig(
         schema=MonoGraph,
-        model="gemma3:latest",
     ),
     "NewVarieties": TaskConfig(
         schema=NewVarieties,
-        model="qwen3-vl:latest",
+        input_mode=InputMode.IMAGE,
     ),
     "SoftwareWritings": TaskConfig(
         schema=SoftwareWritings,
-        model="gemma3:latest",
     ),
     "ResearchAwards": TaskConfig(
         schema=ResearchAwards,
-        model="gemma3:latest",
+        input_mode=InputMode.PDFTOTEXTANDIAMGE,
     ),
     "Paper": TaskConfig(
         schema=Paper,
-        model="gemma3:latest",
+    ),
+    "ImprovedVariety": TaskConfig(
+        schema=ImprovedVariety,
+        input_mode=InputMode.IMAGE,
+    ),
+    "Standard": TaskConfig(
+        schema=Standard,
     ),
 }

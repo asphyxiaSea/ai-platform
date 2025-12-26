@@ -2,14 +2,14 @@ from typing import List
 from fastapi import HTTPException
 import requests
 from pydantic import BaseModel
-from schemas.registry import SCHEMA_REGISTRY
+from schemas.taskconfig import TaskConfig
 
 from marker.output import text_from_rendered
 from util.mark_pdf import CONVERTER
 from io import BytesIO
 
 def chat_texts_pdfs_services(
-    schema_name: str,
+    taskconfig:TaskConfig,
     pdf_bytes_list: List[bytes]
 ) -> BaseModel:
 
@@ -23,20 +23,17 @@ def chat_texts_pdfs_services(
 
     merged_text = "\n\n".join(texts)
     return _call_ollama(
-        schema_name=schema_name,
+        taskconfig=taskconfig,
         texts=merged_text
     )
 
 
 def _call_ollama(
-    schema_name: str,
+    taskconfig:TaskConfig,
     texts: str
 ) -> BaseModel:
 
-    schema = SCHEMA_REGISTRY[schema_name].schema
-    if not schema:
-        raise HTTPException(400, f"Unknown schema: {schema_name}")
-
+    schema = taskconfig.schema
     field_prompts = "\n".join(
         f"- {name}: {field.description}"
         for name, field in schema.model_fields.items()
@@ -55,10 +52,10 @@ def _call_ollama(
     messages = [{"role": "user","content": full_prompt}]
 
     payload = {
-        "model": SCHEMA_REGISTRY[schema_name].model,
+        "model": taskconfig.model,
         "messages": messages,
         "stream": False,
-        "temperature":SCHEMA_REGISTRY[schema_name].temperature,
+        "temperature":taskconfig.temperature,
         # ollama强束缚,保证输出合法性
         "format": schema.model_json_schema()
     }

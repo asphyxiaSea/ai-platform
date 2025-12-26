@@ -3,7 +3,7 @@ from marker.models import create_model_dict
 from marker.config.parser import ConfigParser
 
 # ===== 进程启动时执行一次 =====
-MODEL_DICT = create_model_dict(device="cuda:1")
+MODEL_DICT = create_model_dict(device="cuda:0")
 
 CONVERTER = PdfConverter(
     artifact_dict=MODEL_DICT,

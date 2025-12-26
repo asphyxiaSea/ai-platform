@@ -4,7 +4,7 @@ from marker.converters.pdf import PdfConverter
 from marker.models import create_model_dict
 from marker.config.parser import ConfigParser
 
-pdf_path = "assets/桉树人工林土壤质量演变与提升关键技术——获奖个人证书.pdf"
+pdf_path = "assets/附件3-2Characterization and discrimination of camellia oil varieties according to fatty acid, squalene, tocopherol, and volatile substance contents by chromatogrtaphy chemometrics.pdf"
 
 with open(pdf_path, "rb") as f:
     pdf_bytes = f.read()
@@ -17,18 +17,23 @@ pdf_stream = BytesIO(pdf_bytes)
 
 config = {
     "output_format": "markdown",
-    "page_range": "0-5",
+    "page_range": "0",
     "disable_image_extraction": True,
     "langs": ["Chinese"]
 }
 config_parser = ConfigParser(config)
 
 converter = PdfConverter(
-    config=config_parser.generate_config_dict(),
-    artifact_dict=create_model_dict(device="cuda:1"),
-    processor_list=config_parser.get_processors(),
-    renderer=config_parser.get_renderer(),
-    llm_service=config_parser.get_llm_service()
+# marker-pdf 的全局配置字典
+config=config_parser.generate_config_dict(),
+# 模型资源注册表
+artifact_dict=create_model_dict(device="cuda"),
+# （核心）结构化中间结果的处理器链
+processor_list=config_parser.get_processors(),
+# 最终输出格式的渲染器，选择输出什么格式json、markdown等
+renderer=config_parser.get_renderer(),
+# LLM 增强模块（可选）
+llm_service=config_parser.get_llm_service()
 )
 
 # 4. 执行转换

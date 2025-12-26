@@ -2,52 +2,46 @@ from typing import List,Optional,Dict, Any
 from fastapi import HTTPException
 from util.pdf_utils import pdf_bytes_to_base64_images,image_bytes_to_base64
 from pydantic import BaseModel
-from schemas.registry import SCHEMA_REGISTRY
+from schemas.taskconfig import TaskConfig
 import requests
 
-def chat_multimodal_images_services(schema_name: str,image_bytes: List[bytes]) -> BaseModel:
-    if not image_bytes:
-        raise HTTPException(400, "image_bytes is required")
+def chat_multimodal_images_services(taskconfig:TaskConfig,image_bytes_list: List[bytes]) -> BaseModel:
+    if not image_bytes_list:
+        raise HTTPException(400, "image_bytes_list is required")
 
-    images_bytes = [
-        image_bytes_to_base64(b) for b in image_bytes
+    images_base64_list = [
+        image_bytes_to_base64(b) for b in image_bytes_list
     ]
-
     return _call_multimodal_ollama(
-        schema_name=schema_name,
-        images_bytes=images_bytes
+        taskconfig=taskconfig,
+        images_base64_list=images_base64_list
     )
 
 
 def chat_multimodal_pdfs_services(
-    schema_name: str,
+    taskconfig: TaskConfig,
     pdf_bytes_list: List[bytes]
 ) -> BaseModel:
 
-    all_images_bytes = []
+    images_base64_list = []
 
     for idx, pdf_bytes in enumerate(pdf_bytes_list):
         images_bytes = pdf_bytes_to_base64_images(pdf_bytes)
 
         # 合并所有 PDF 的图片
-        all_images_bytes.extend(images_bytes)
+        images_base64_list.extend(images_bytes)
 
     return _call_multimodal_ollama(
-        schema_name=schema_name,
-        images_bytes=all_images_bytes
+        taskconfig=taskconfig,
+        images_base64_list=images_base64_list
     )
 
 # 多模态调用ollama
 def _call_multimodal_ollama(
-    schema_name: str,
-    images_bytes: Optional[List[str]] = None
+    taskconfig: TaskConfig,
+    images_base64_list: Optional[List[str]] = None
 ) -> BaseModel:
-
-    # 获取类
-    schema = SCHEMA_REGISTRY[schema_name].schema
-    if not schema:
-        raise HTTPException(400, f"Unknown schema: {schema_name}")
-
+    schema = taskconfig.schema
     field_prompts = "\n".join(
         f"- {name}: {field.description}"
         for name, field in schema.model_fields.items()
@@ -67,14 +61,14 @@ def _call_multimodal_ollama(
         "content": full_prompt,
     }
 
-    if images_bytes:
-        message["images"] = images_bytes
+    if images_base64_list:
+        message["images"] = images_base64_list
 
     payload = {
-        "model": SCHEMA_REGISTRY[schema_name].model,
+        "model": taskconfig.vl_model,
         "messages": [message],
         "stream": False,
-        "temperature":SCHEMA_REGISTRY[schema_name].temperature,
+        "temperature":taskconfig.temperature,
         # ollama强束缚,保证输出合法性
         "format":schema.model_json_schema()
     }
