@@ -7,7 +7,8 @@ from .linke.research_awards import ResearchAwards
 from .linke.paper import Paper
 from .linke.improved_variety import ImprovedVariety
 from .linke.standard import Standard
-from .taskconfig import TaskConfig, InputMode
+from .taskconfig import TaskConfig, TaskMode
+from util.marker_pdf import MarkerPDF
 
 SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     "Patent": TaskConfig(
@@ -18,21 +19,25 @@ SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     ),
     "NewVarieties": TaskConfig(
         schema=NewVarieties,
-        input_mode=InputMode.IMAGE,
+        task_mode=TaskMode.IMAGE,
     ),
     "SoftwareWritings": TaskConfig(
         schema=SoftwareWritings,
     ),
     "ResearchAwards": TaskConfig(
         schema=ResearchAwards,
-        input_mode=InputMode.PDFTOTEXTANDIAMGE,
+        task_mode=TaskMode.PDFTOTEXTANDIAMGE,
     ),
     "Paper": TaskConfig(
         schema=Paper,
+        marker_pdf=MarkerPDF(
+            page_range=list(range(0, 5)),
+            processor_name_list=["order","section_header","line_merge","text","ignoretext"]
+        ),
     ),
     "ImprovedVariety": TaskConfig(
         schema=ImprovedVariety,
-        input_mode=InputMode.IMAGE,
+        task_mode=TaskMode.IMAGE,
     ),
     "Standard": TaskConfig(
         schema=Standard,

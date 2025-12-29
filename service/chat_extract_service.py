@@ -1,5 +1,5 @@
 from schemas.registry import SCHEMA_REGISTRY
-from schemas.taskconfig import InputMode
+from schemas.taskconfig import TaskMode
 from service.multimodal_service import chat_multimodal_images_services,chat_multimodal_pdfs_services
 from service.text_service import chat_texts_pdfs_services
 
@@ -16,7 +16,7 @@ async def chat_extract_service(
 
     # -------- task 分配 --------
     # -------- PDF转纯文本 --------
-    if taskconfig.input_mode == InputMode.PDFTOTEXT:
+    if taskconfig.task_mode == TaskMode.PDFTOTEXT:
         if not pdf_bytes_list:
             raise ValueError("This schema requires pdf input")
         return chat_texts_pdfs_services(
@@ -24,7 +24,7 @@ async def chat_extract_service(
             pdf_bytes_list=pdf_bytes_list,
         )
     # -------- image多模态 --------
-    elif taskconfig.input_mode == InputMode.IMAGE:
+    elif taskconfig.task_mode == TaskMode.IMAGE:
         if not image_bytes_list:
             raise ValueError("This schema requires image input")
         return chat_multimodal_images_services(
@@ -32,7 +32,7 @@ async def chat_extract_service(
             image_bytes_list=image_bytes_list,
         )
     # -------- pdftoimage多模态 --------
-    elif taskconfig.input_mode == InputMode.PDFTOIMAGE:
+    elif taskconfig.task_mode == TaskMode.PDFTOIMAGE:
         if not pdf_bytes_list:
             raise ValueError("This schema requires pdf input")
         return chat_multimodal_pdfs_services(
@@ -40,7 +40,7 @@ async def chat_extract_service(
             pdf_bytes_list=pdf_bytes_list,
         )
     # -------- PDF转纯文本 + image多模态 --------
-    elif taskconfig.input_mode == InputMode.PDFTOTEXTANDIAMGE:
+    elif taskconfig.task_mode == TaskMode.PDFTOTEXTANDIAMGE:
         if pdf_bytes_list:
             return chat_texts_pdfs_services(
                 taskconfig=taskconfig,

@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from schemas.taskconfig import TaskConfig
 
 from marker.output import text_from_rendered
-from util.mark_pdf import CONVERTER
+from util.marker_pdf import MarkerPDF
 from io import BytesIO
 
 def chat_texts_pdfs_services(
@@ -14,12 +14,11 @@ def chat_texts_pdfs_services(
 ) -> BaseModel:
 
     texts = []
-
+    if taskconfig.marker_pdf is None:
+        taskconfig.marker_pdf = MarkerPDF()
     for idx, pdf_bytes in enumerate(pdf_bytes_list):
-        rendered = CONVERTER(BytesIO(pdf_bytes))
-        full_text, _, _ = text_from_rendered(rendered)
-
-        texts.append(f"【PDF {idx+1}】\n{full_text}")
+        text = taskconfig.marker_pdf.extract_text(BytesIO(pdf_bytes))
+        texts.append(f"[PDF {idx+1}]\n{text}")
 
     merged_text = "\n\n".join(texts)
     return _call_ollama(
