@@ -67,7 +67,24 @@ class MarkerPDF:
         # 输出格式，默认为 markdown
         output_format: str = "markdown",
         # 推理 processor 列表
-        processor_name_list: list[str] | None = None,
+        processor_name_list: list[str] = [
+        # 1️⃣ 顺序 & 稳定（必须）
+        "order",
+        "block_relabel",
+        "line_merge",
+
+        # 2️⃣ 核心结构（办公文档常见）
+        "list",              # 项目列表 / 申报信息
+        "page_header",       # 抬头、单位、项目名
+        "section_header",    # “一、项目概况” 这类
+
+        # 3️⃣ 表格（慎用，但保留规则版）
+        "table",             # 规则表格
+
+        # 4️⃣ 输出 & 安全
+        "text",
+        "blank_page",
+        ]
     ):
         self.device = device
         self.page_range = page_range
@@ -99,7 +116,7 @@ class MarkerPDF:
                 PROCESSORS[name]
                 for name in self.processor_name_list
             ]
-            
+
         # ===== 构建 converter =====
         self.converter = PdfConverter(
             config=config,
@@ -107,11 +124,25 @@ class MarkerPDF:
             processor_list=processor_list,
         )
 
+
     def extract_text(self,pdf: Union[str, io.BytesIO]) -> str:
         """
         返回干净、可直接用于 RAG 的全文字符串
         """
         rendered = self.converter(pdf)
-
         text, _, _ = text_from_rendered(rendered)
+        text = keep_only_metadata_blocks(text)
+        print(text)
         return text
+    
+    import re
+
+def keep_only_metadata_blocks(full_text: str) -> str:
+    lines = full_text.splitlines()
+
+    info_lines = [
+        l for l in lines
+        if len(l) <= 300
+    ]
+
+    return "\n".join(info_lines) + "\n"

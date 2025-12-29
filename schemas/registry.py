@@ -31,8 +31,9 @@ SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     "Paper": TaskConfig(
         schema=Paper,
         marker_pdf=MarkerPDF(
-            page_range=list(range(0, 5)),
-            processor_name_list=["order","section_header","line_merge","text","ignoretext"]
+            page_range=list(range(0, 1)),
+            # processor_name_list=["order","block_relabel","list","page_header","toc",
+            #                      "section_header","blank_page","line_merge","text"]
         ),
     ),
     "ImprovedVariety": TaskConfig(

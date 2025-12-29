@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional
 class Patent(BaseModel):
     """
     你是一个中文专利信息结构化抽取助手，提取markdown格式的文本信息。
@@ -12,14 +12,24 @@ class Patent(BaseModel):
         description="专利名称"
     )
 
-    patent_type: str = Field(
-        "",
-        description="专利类型"
+    patent_type: Optional[int] = Field(
+        None,
+        description=(
+        "专利类型代码。"
+        "只能返回一个整数，不要返回文字。"
+        "取值范围："
+        "1=PCT，2=发明专利，3=实用新型专利，4=外观设计"
+        )
     )
 
-    legal_status: str = Field(
-        "",
-        description="法律状态，例如：已授权、申请中、已公开、已失效"
+    legal_status: Optional[int] = Field(
+        None,
+        description=(
+        "法律状态代码。"
+        "只能返回一个整数，不要返回文字。"
+        "取值范围："
+        "1=申请，2=授权，3=转让，4=失效，5=撤回，6=驳回。"
+        )
     )
 
     application_date: str = Field(

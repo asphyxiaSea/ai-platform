@@ -4,7 +4,6 @@ import requests
 from pydantic import BaseModel
 from schemas.taskconfig import TaskConfig
 
-from marker.output import text_from_rendered
 from util.marker_pdf import MarkerPDF
 from io import BytesIO
 
