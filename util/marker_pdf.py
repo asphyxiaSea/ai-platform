@@ -49,6 +49,27 @@ PROCESSORS: dict[str, str] = {
     "ignoretext": "marker.processors.ignoretext.IgnoreTextProcessor"
 }
 
+DEFAULT_PROCESSORS = [
+        # 1️⃣ 顺序 & 稳定（必须）
+        "order",
+        "block_relabel",
+        "line_merge",
+
+        # 2️⃣ 常见结构
+        "list",
+        "page_header",
+        "section_header",
+        "reference",
+        "toc",
+
+        # 3️⃣ 表格（默认开启）
+        "table",
+
+        # 4️⃣ 输出
+        "text",
+        "blank_page",
+    ]
+
 class MarkerPDF:
     """
     高性能 PDF → RAG 文本抽取流水线
@@ -66,31 +87,14 @@ class MarkerPDF:
         extract_images: bool = False,
         # 输出格式，默认为 markdown
         output_format: str = "markdown",
-        # 推理 processor 列表
-        processor_name_list: list[str] = [
-        # 1️⃣ 顺序 & 稳定（必须）
-        "order",
-        "block_relabel",
-        "line_merge",
-
-        # 2️⃣ 核心结构（办公文档常见）
-        "list",              # 项目列表 / 申报信息
-        "page_header",       # 抬头、单位、项目名
-        "section_header",    # “一、项目概况” 这类
-
-        # 3️⃣ 表格（慎用，但保留规则版）
-        "table",             # 规则表格
-
-        # 4️⃣ 输出 & 安全
-        "text",
-        "blank_page",
-        ]
+        # 忽略的 processor 列表
+        ignore_processors: list[str] | None = None,
     ):
         self.device = device
         self.page_range = page_range
         self.extract_images = extract_images
         self.output_format = output_format
-        self.processor_name_list = processor_name_list
+        self.ignore_processors = ignore_processors
 
         self._build_converter()
 
@@ -107,14 +111,16 @@ class MarkerPDF:
 
         # ===== 第二层：语义过滤（processors）=====
         processor_list = None
-        if self.processor_name_list:
-            unknown = set(self.processor_name_list) - PROCESSORS.keys()
-            if unknown:
-                raise ValueError(f"Unknown processors: {unknown}")
-
+        if self.ignore_processors is None:
             processor_list = [
                 PROCESSORS[name]
-                for name in self.processor_name_list
+                for name in DEFAULT_PROCESSORS
+            ]
+        else:
+            processor_list = [
+                PROCESSORS[name]
+                for name in DEFAULT_PROCESSORS
+                if name not in self.ignore_processors
             ]
 
         # ===== 构建 converter =====
@@ -131,18 +137,18 @@ class MarkerPDF:
         """
         rendered = self.converter(pdf)
         text, _, _ = text_from_rendered(rendered)
-        text = keep_only_metadata_blocks(text)
-        print(text)
+        # text = keep_only_metadata_blocks(text)
+        # print(text)
         return text
     
-    import re
+
 
 def keep_only_metadata_blocks(full_text: str) -> str:
     lines = full_text.splitlines()
 
     info_lines = [
         l for l in lines
-        if len(l) <= 300
+        if 5 <= len(l) <= 300
     ]
 
     return "\n".join(info_lines) + "\n"

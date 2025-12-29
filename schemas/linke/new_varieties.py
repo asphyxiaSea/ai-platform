@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List
+from typing import Optional,List
 
 class NewVarieties(BaseModel):
     """
@@ -18,9 +18,14 @@ class NewVarieties(BaseModel):
         description="品种权号（植物新品种权号）"
     )
 
-    variety_status: str = Field(
-        "",
-        description="品种状态，例如：申请中、已授权、已公告、已失效"
+    variety_status: Optional[int] = Field(
+        None,
+        description=(
+        "品种状态代码。"
+        "只能返回一个整数，不要返回文字。"
+        "取值范围："
+        "1=申请，2=授权，3=转让"
+        )
     )
 
     application_date: str = Field(
