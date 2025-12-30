@@ -2,6 +2,8 @@ from schemas.registry import SCHEMA_REGISTRY
 from schemas.taskconfig import TaskMode
 from service.multimodal_service import chat_multimodal_images_services,chat_multimodal_pdfs_services
 from service.text_service import chat_texts_pdfs_services
+from service.text_chunk_service import chat_text_pdfs_service
+
 
 async def chat_extract_service(
     *,
@@ -51,4 +53,11 @@ async def chat_extract_service(
                 taskconfig=taskconfig,
                 image_bytes_list=image_bytes_list,
             )
-        
+    # -------- PDF转纯文本+分页 --------  
+    elif taskconfig.task_mode == TaskMode.PDFTOTEXTBYCHUNK:
+        if not pdf_bytes_list:
+            raise ValueError("This schema requires pdf input")
+        return chat_text_pdfs_service(
+            taskconfig=taskconfig,
+            pdf_bytes_list=pdf_bytes_list,
+        )

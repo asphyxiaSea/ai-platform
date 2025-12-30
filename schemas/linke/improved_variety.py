@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from typing import Optional
 
 class ImprovedVariety(BaseModel):
     """
@@ -16,7 +17,15 @@ class ImprovedVariety(BaseModel):
     species: str = Field("", description="树种")
     variety_level: str = Field("", description="良种等级")
     variety_code: str = Field("", description="良种编号")
-    variety_status: str = Field("", description="良种状态")
+    variety_status: Optional[int] = Field(
+        None,
+        description=(
+        "良种状态代码。"
+        "只能返回一个整数，不要返回文字。"
+        "取值范围："
+        "1=原始取得，2=继受取得"
+        )
+    )
     approval_date: str = Field("", description="认定或审定日期，例如:2022年8月输出2022-08")
     applicant: str = Field("", description="申请人")
     breeder: str = Field("", description="选育人")

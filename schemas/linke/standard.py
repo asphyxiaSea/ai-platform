@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from typing import Optional
 
 class Standard(BaseModel):
     """
@@ -9,8 +10,25 @@ class Standard(BaseModel):
 
     standard_name: str = Field("", description="标准名称")
     standard_code: str = Field("", description="标准号")
-    standard_type: str = Field("", description="标准类型")
-    standard_status: str = Field("", description="标准状态")
+
+    standard_type: Optional[int] = Field(
+        None,
+        description=(
+        "标准类型代码。"
+        "只能返回一个整数，不要返回文字。"
+        "取值范围："
+        "1=国家标准，2=行业标准，3=地方标准，4=团体标准"
+        )
+    )    
+    standard_status: Optional[int] = Field(
+        None,
+        description=(
+        "标准状态代码。"
+        "只能返回一个整数，不要返回文字。"
+        "取值范围："
+        "1=发布，2=现行，3=废止"
+        )
+    )
     publish_date: str = Field("", description="发布时间,例如:2023年6月输出2023-06")
     implement_date: str = Field("", description="实施时间,例如:2023年6月输出2023-06")
     drafting_organizations: str = Field("", description="起草单位")

@@ -8,6 +8,7 @@ class TaskMode(Enum):
     PDFTOTEXT = "pdftotext"
     PDFTOIMAGE = "pdftoimage"
     PDFTOTEXTANDIAMGE = "pdftotextandimage"
+    PDFTOTEXTBYCHUNK = "pdftotextbychunk"
 
 class TaskConfig:
     def __init__(

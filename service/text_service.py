@@ -1,8 +1,7 @@
 from typing import List
-from fastapi import HTTPException
-import requests
 from pydantic import BaseModel
 from schemas.taskconfig import TaskConfig
+from util.call_ollama import call_ollama_format
 
 from util.marker_pdf import MarkerPDF
 from io import BytesIO
@@ -27,15 +26,17 @@ def chat_texts_pdfs_services(
 
 
 def _call_ollama(
-    taskconfig:TaskConfig,
+    taskconfig: TaskConfig,
     texts: str
-) -> BaseModel:
+) -> BaseModel :
 
     schema = taskconfig.schema
+
     field_prompts = "\n".join(
         f"- {name}: {field.description}"
         for name, field in schema.model_fields.items()
-)
+    )
+
     task_description = (schema.__doc__ or "").strip()
 
     full_prompt = f"""
@@ -46,26 +47,14 @@ def _call_ollama(
 [文档内容]
 {texts}
 """
-    
-    messages = [{"role": "user","content": full_prompt}]
 
-    payload = {
-        "model": taskconfig.model,
-        "messages": messages,
-        "stream": False,
-        "temperature":taskconfig.temperature,
-        # ollama强束缚,保证输出合法性
-        "format": schema.model_json_schema()
-    }
+    messages = [
+        {"role": "user", "content": full_prompt}
+    ]
 
-    try:
-        resp = requests.post(
-            "http://localhost:8001/api/chat",
-            json=payload,
-            timeout=100,
-        )
-        resp.raise_for_status()
-    except requests.RequestException:
-        raise HTTPException(502, "推理超时或 Ollama 服务异常")
-
-    return schema.model_validate_json(resp.json()["message"]["content"])
+    return call_ollama_format(
+        model=taskconfig.model,
+        schema=schema,
+        messages=messages,
+        temperature=taskconfig.temperature,
+    )

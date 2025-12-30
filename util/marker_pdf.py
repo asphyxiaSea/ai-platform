@@ -62,9 +62,6 @@ DEFAULT_PROCESSORS = [
         "reference",
         "toc",
 
-        # 3️⃣ 表格（默认开启）
-        "table",
-
         # 4️⃣ 输出
         "text",
         "blank_page",
@@ -87,41 +84,73 @@ class MarkerPDF:
         extract_images: bool = False,
         # 输出格式，默认为 markdown
         output_format: str = "markdown",
-        # 忽略的 processor 列表
-        ignore_processors: list[str] | None = None,
+        # 移除的 processor 列表
+        remove_processor: list[str] | None = None,
+        # 追加的 processor 列表
+        append_processor: list[str] | None = None,
+        # python脚本的文本降噪
+        filter_noisy: bool = False,
+        
     ):
         self.device = device
         self.page_range = page_range
         self.extract_images = extract_images
         self.output_format = output_format
-        self.ignore_processors = ignore_processors
+        self._build_converter(remove_processor, append_processor)
+        self.filter_noisy = filter_noisy
 
-        self._build_converter()
 
-
-    def _build_converter(self):
-
+    def _build_converter(
+        self,
+        remove_processors: list[str] | None = None,
+        append_processors: list[str] | None = None,
+    ):
         # ===== 第一层：性能过滤（config）=====
         config: dict[str, Any] = {
             "extract_images": self.extract_images,
+            # 对每一页pdf加入明显标识
+            "paginate_output": True,
             "output_format": self.output_format,
         }
         if self.page_range:
             config["page_range"] = self.page_range
 
-        # ===== 第二层：语义过滤（processors）=====
-        processor_list = None
-        if self.ignore_processors is None:
-            processor_list = [
-                PROCESSORS[name]
-                for name in DEFAULT_PROCESSORS
-            ]
-        else:
-            processor_list = [
-                PROCESSORS[name]
-                for name in DEFAULT_PROCESSORS
-                if name not in self.ignore_processors
-            ]
+        # ===== 第二层：processor 构建 =====
+
+        # ---- 1️⃣ remove 校验 ----
+        if remove_processors:
+            invalid = set(remove_processors) - set(DEFAULT_PROCESSORS)
+            if invalid:
+                raise ValueError(
+                    f"Unknown processors in remove_processors: {invalid}"
+                )
+
+        # ---- 2️⃣ append 校验 ----
+        if append_processors:
+            invalid = set(append_processors) - set(PROCESSORS)
+            if invalid:
+                raise ValueError(
+                    f"Unknown processors in append_processors: {invalid}"
+                )
+
+        # ---- 3️⃣ 构建 pipeline（先 remove）----
+        ignored = set(remove_processors or [])
+        processor_names = [
+            name for name in DEFAULT_PROCESSORS
+            if name not in ignored
+        ]
+
+        # ---- 4️⃣ append ----
+        if append_processors:
+            for name in append_processors:
+                if name not in processor_names:
+                    processor_names.append(name)
+
+        # ---- 5️⃣ 映射为 processor 类 ----
+        processor_list = [
+            PROCESSORS[name]
+            for name in processor_names
+        ]
 
         # ===== 构建 converter =====
         self.converter = PdfConverter(
@@ -137,15 +166,14 @@ class MarkerPDF:
         """
         rendered = self.converter(pdf)
         text, _, _ = text_from_rendered(rendered)
-        # text = keep_only_metadata_blocks(text)
-        # print(text)
+        if self.filter_noisy:
+            text = filter_noisy(text)
         return text
-    
 
-
-def keep_only_metadata_blocks(full_text: str) -> str:
+# 基于行长度的文本降噪 / 粗粒度内容筛选（heuristic filter）
+def filter_noisy(full_text: str) -> str:
     lines = full_text.splitlines()
-
+    # 排除正文
     info_lines = [
         l for l in lines
         if 5 <= len(l) <= 300
