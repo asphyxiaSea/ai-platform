@@ -7,6 +7,7 @@ from .linke.research_awards import ResearchAwards
 from .linke.paper import Paper
 from .linke.improved_variety import ImprovedVariety
 from .linke.standard import Standard
+from .linke.project_application import ProjectApplication
 from .taskconfig import TaskConfig, TaskMode
 from util.marker_pdf import MarkerPDF
 
@@ -31,7 +32,7 @@ SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     "Paper": TaskConfig(
         schema=Paper,
         marker_pdf=MarkerPDF(
-             page_range=list(range(0, 5)),
+            page_range=list(range(0, 5)),
             filter_noisy=True,
         ),
     ),
@@ -42,5 +43,14 @@ SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     "Standard": TaskConfig(
         schema=Standard,
     ),
-
+    "ProjectApplication": TaskConfig(
+        schema=ProjectApplication,
+        # task_mode=TaskMode.PDFTOTEXTBYCHUNK,
+        model="qwen3:latest",
+        marker_pdf=MarkerPDF(
+            append_processor=["table"],
+            page_range=list(range(0, 10)),
+            # filter_noisy=True,
+        ),
+    ),
 }

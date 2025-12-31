@@ -192,26 +192,25 @@ def _call_ollama(
 
     schema = taskconfig.schema
 
-    field_prompts = "\n".join(
-        f"- {name}: {field.description}"
+    field_prompts = ";".join(
+        f"{name}: {field.description}"
         for name, field in schema.model_fields.items()
     )
 
     full_prompt = f"""
-[任务]
-你正在从一段文档中提取“关键信息要点”，
-用于后续统一整理与结构化。
+从下列中文文档中抽取关键信息要点。
 
-[要求]
-1. 只提取文档中明确出现的信息
-2. 不要猜测、不要补全、不要推理
-3. 如果某类信息不存在，可以不输出
-4. 使用简洁、客观、可拼接的文本格式
-5. 不要输出 JSON、不要输出解释说明
+规则：
+1. 仅允许提取【以下字段范围】内的信息
+2. 仅当文档中明确出现时才提取
+3. 不要总结、不要推理、不要补全
+4. 不要引入字段范围之外的信息
 
-[需要关注的信息类型]
+字段范围：
 {field_prompts}
 
+输出：
+用一段简洁文本，只包含可直接对应到上述字段的原文信息片段。
 [文档内容]
 {texts}
 """

@@ -42,7 +42,7 @@ def _call_ollama(
     full_prompt = f"""
 [任务说明]
 {task_description}
-[字段提示]
+[所需字段及说明]
 {field_prompts}
 [文档内容]
 {texts}

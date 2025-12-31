@@ -57,7 +57,7 @@ def call_ollama(
         resp = requests.post(
             "http://localhost:8001/api/chat",
             json=payload,
-            timeout=100,
+            timeout=200,
         )
         resp.raise_for_status() 
     except requests.RequestException:

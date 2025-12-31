@@ -176,7 +176,7 @@ def filter_noisy(full_text: str) -> str:
     # 排除正文
     info_lines = [
         l for l in lines
-        if 5 <= len(l) <= 300
+        if 5 <= len(l) <= 200
     ]
 
     return "\n".join(info_lines) + "\n"
