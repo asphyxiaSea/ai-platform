@@ -8,13 +8,10 @@ class NewVarieties(BaseModel):
     不要输出 Schema 中未定义的字段。
     """
 
-    variety_name: str = Field(
-        "",
-        description="品种名称"
-    )
+    variety_name: Optional[str] = Field(None,description="品种名称")
 
-    variety_right_number: str = Field(
-        "",
+    variety_right_number: Optional[str] = Field(
+        None,
         description="品种权号（植物新品种权号）"
     )
 
@@ -28,22 +25,22 @@ class NewVarieties(BaseModel):
         )
     )
 
-    application_date: str = Field(
-        "",
+    application_date: Optional[str] = Field(
+        None,
         description="申请日期,输出格式如：2022-03-15、2022-03"
     )
 
-    grant_date: str = Field(
-        "",
+    grant_date: Optional[str] = Field(
+        None,
         description="授权日期,输出格式如：2022-03-15、2022-03;未授权则为空字符串"
     )
 
-    variety_right_holder: str = Field(
-        "",
+    variety_right_holder: Optional[str] = Field(
+        None,
         description="品种权人（单位或个人）"
     )
 
-    breeders: List[str] = Field(
+    breeders: Optional[List[str]] = Field(
         default_factory=list,
         description="选育人列表，按原文顺序提取"
     )

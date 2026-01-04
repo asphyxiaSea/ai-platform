@@ -32,7 +32,7 @@ SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     "Paper": TaskConfig(
         schema=Paper,
         marker_pdf=MarkerPDF(
-            page_range=list(range(0, 5)),
+            page_range=list(range(0, 4)),
             filter_noisy=True,
         ),
     ),

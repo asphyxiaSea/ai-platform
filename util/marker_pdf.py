@@ -77,7 +77,7 @@ class MarkerPDF:
 
     def __init__(
         self,
-        device: str = "cuda:1",
+        device: str = "cuda:0",
         # 提取pdf文件的页码范围
         page_range: list[int] | None = None,
         # 是否提取图片,默认为否

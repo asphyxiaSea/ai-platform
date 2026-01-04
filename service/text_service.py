@@ -1,7 +1,8 @@
 from typing import List
 from pydantic import BaseModel
 from schemas.taskconfig import TaskConfig
-from util.call_ollama import call_ollama_format
+from util.ollama import ollama_format_output
+from util.openai import openai_structure_output
 
 from util.marker_pdf import MarkerPDF
 from io import BytesIO
@@ -9,52 +10,80 @@ from io import BytesIO
 def chat_texts_pdfs_services(
     taskconfig:TaskConfig,
     pdf_bytes_list: List[bytes]
-) -> BaseModel:
-
-    texts = []
+) -> List[BaseModel]:
+    results: List[BaseModel] = []
     if taskconfig.marker_pdf is None:
         taskconfig.marker_pdf = MarkerPDF()
     for idx, pdf_bytes in enumerate(pdf_bytes_list):
         text = taskconfig.marker_pdf.extract_text(BytesIO(pdf_bytes))
-        texts.append(f"[PDF {idx+1}]\n{text}")
-
-    merged_text = "\n\n".join(texts)
-    return _call_ollama(
-        taskconfig=taskconfig,
-        texts=merged_text
-    )
+        results.append(_call_ollama(
+            taskconfig=taskconfig,
+            text=text
+        ))
+    return results
 
 
 def _call_ollama(
     taskconfig: TaskConfig,
-    texts: str
-) -> BaseModel :
+    text: str
+) -> BaseModel:
 
-    schema = taskconfig.schema
-
+    # 1️⃣ 字段说明
     field_prompts = "\n".join(
         f"- {name}: {field.description}"
-        for name, field in schema.model_fields.items()
+        for name, field in taskconfig.schema.model_fields.items()
+        if field.description
     )
 
-    task_description = (schema.__doc__ or "").strip()
+    # 2️⃣ 任务说明（schema docstring）
+    task_description = (taskconfig.schema.__doc__ or "").strip()
 
-    full_prompt = f"""
-[任务说明]
+    # 3️⃣ system prompt：规则 + 约束
+    system_prompt = f"""
+【任务说明】
 {task_description}
-[所需字段及说明]
+
+【字段定义】
 {field_prompts}
-[文档内容]
-{texts}
-"""
+""".strip()
+
+    user_prompt = f"""
+【文档内容】
+{text}
+""".strip()
 
     messages = [
-        {"role": "user", "content": full_prompt}
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt},
     ]
 
-    return call_ollama_format(
+    return ollama_format_output(
         model=taskconfig.model,
-        schema=schema,
+        schema=taskconfig.schema,
+        messages=messages,
+        temperature=taskconfig.temperature,
+    )
+
+
+def _call_openai(
+    taskconfig: TaskConfig,
+    text: str
+) -> BaseModel:
+
+    messages = [
+        {
+            "role": "system", 
+            "content": (taskconfig.schema.__doc__ or "").strip()
+        },
+        {
+            "role": "user", 
+            "content": f"请从以下文本中提取专利信息：\n\n{text}"
+        },
+    ]
+
+    return openai_structure_output(
+        model=taskconfig.model,
+        schema=taskconfig.schema,
         messages=messages,
         temperature=taskconfig.temperature,
     )

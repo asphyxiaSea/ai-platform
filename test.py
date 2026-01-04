@@ -5,67 +5,99 @@ from marker.models import create_model_dict
 from marker.renderers.markdown import MarkdownRenderer
 from schemas.registry import SCHEMA_REGISTRY
 
-pdf_path = "assets/附件3-2Characterization and discrimination of camellia oil varieties according to fatty acid, squalene, tocopherol, and volatile substance contents by chromatogrtaphy chemometrics.pdf"
+from openai import OpenAI
+from pydantic import BaseModel, Field
+from typing import List, Optional
+class NewVarieties(BaseModel):
+    """
+    你是一个中文新品种信息结构化抽取助手，提取markdown格式的文本信息。
+    不要输出任何解释、说明、Markdown 或多余文本。
+    不要输出 Schema 中未定义的字段。
+    """
 
-def cls_path(cls: type) -> str:
-    return f"{cls.__module__}.{cls.__qualname__}"
+    variety_name: str = Field(
+        "",
+        description="品种名称"
+    )
 
+    variety_right_number: str = Field(
+        "",
+        description="品种权号（植物新品种权号）"
+    )
+
+    variety_status: Optional[int] = Field(
+        None,
+        description=(
+        "品种状态代码。"
+        "只能返回一个整数，不要返回文字。"
+        "取值范围："
+        "1=申请，2=授权，3=转让"
+        )
+    )
+
+    application_date: str = Field(
+        "",
+        description="申请日期,输出格式如：2022-03-15、2022-03"
+    )
+
+    grant_date: str = Field(
+        "",
+        description="授权日期,输出格式如：2022-03-15、2022-03;未授权则为空字符串"
+    )
+
+    variety_right_holder: str = Field(
+        "",
+        description="品种权人（单位或个人）"
+    )
+
+    breeders: List[str] = Field(
+        default_factory=list,
+        description="选育人列表，按原文顺序提取"
+    )
+
+pdf_path = "assets/植物新品种权证书(赤云相思）.jpg"
 
 with open(pdf_path, "rb") as f:
     pdf_bytes = f.read()
 
 pdf_stream = BytesIO(pdf_bytes)
 
-
-# 3. 初始化转换器
-# 你可以在这里指定语言
-taskconfig = SCHEMA_REGISTRY.get("Paper")
-if not taskconfig:
-    raise ValueError(f"Unknown schema: {'Paper'}")
-schema = taskconfig.schema
-
-
-config= {
-    "extract_images": False,
-    "disable_multiprocessing": True,
-
-}
-
-
-converter = PdfConverter(
-# marker-pdf 的全局配置字典
-config=config,
-# 模型资源注册表
-artifact_dict=create_model_dict(device="cuda:1"),
-# （核心）结构化中间结果的处理器链
-processor_list =[
-    "marker.processors.order.OrderProcessor",
-    # "marker.processors.sectionheader.SectionHeaderProcessor",
-    "marker.processors.line_merge.LineMergeProcessor",
-    "marker.processors.text.TextProcessor",
-],
-# 最终输出格式的渲染器，选择输出什么格式json、markdown等
-renderer=cls_path(MarkdownRenderer),
+# 指向本地 Ollama 服务
+client = OpenAI(
+    base_url='http://localhost:8001/v1',
+    api_key='ollama', # 随便填，不能为空
 )
 
-# 4. 执行转换
-rendered = converter(pdf_stream)
+import base64
 
-# 5. 提取文本内容
-full_text, _, _ = text_from_rendered(rendered)
+def encode_image_to_base64(image_path):
+    """将本地图片文件转换为 base64 字符串"""
+    with open(image_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode('utf-8')
+    
+# 1. 准备图片路径
+path_to_image = pdf_path
+base64_image = encode_image_to_base64(path_to_image)
 
+completion = client.beta.chat.completions.parse(
+    model="qwen3-vl:latest", # 确保你已经 ollama pull 了这个模型
+    messages=[
+        {"role": "user", 
+         "content": [
+            {
+                "type": "text", 
+                "text": "提取图中内容"
+            },
+            {
+                "type": "image_url",
+                "image_url": {
+                    "url": f"data:image/jpeg;base64,{base64_image}"
+                }
+            }
+        ]},
 
+    ],
+    response_format=NewVarieties,
+)
 
-# print(full_text)
-
-def keep_only_metadata_blocks(full_text: str) -> str:
-    lines = full_text.splitlines()
-
-    # 删除过长和过短的行
-    info_lines = [l for l in lines if 5 <= len(l) <= 300]
-
-    return "\n".join(info_lines) + "\n"
-print("==== Cleaned Text ====")
-print(keep_only_metadata_blocks(full_text))
-
-
+print(completion.choices[0].message.content)

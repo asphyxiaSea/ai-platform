@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from fastapi import HTTPException
 import requests
 
-def call_ollama_format(
+def ollama_format_output(
     *,
     model: str,
     schema: type[BaseModel],
@@ -39,7 +39,7 @@ def call_ollama_format(
     return schema.model_validate_json(content)
 
 
-def call_ollama(
+def ollama_output(
     *,
     model: str,
     messages: list[dict],

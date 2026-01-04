@@ -8,8 +8,8 @@ class Standard(BaseModel):
     不要输出 Schema 中未定义的字段。
     """
 
-    standard_name: str = Field("", description="标准名称")
-    standard_code: str = Field("", description="标准号")
+    standard_name: Optional[str] = Field(None,description="标准名称")
+    standard_code: Optional[str] = Field(None,description="标准号")
 
     standard_type: Optional[int] = Field(
         None,
@@ -29,7 +29,7 @@ class Standard(BaseModel):
         "1=发布，2=现行，3=废止"
         )
     )
-    publish_date: str = Field("", description="发布时间,例如:2023年6月输出2023-06")
-    implement_date: str = Field("", description="实施时间,例如:2023年6月输出2023-06")
-    drafting_organizations: str = Field("", description="起草单位")
-    drafters: str = Field("", description="起草人")
+    publish_date: Optional[str] = Field(None,description="发布时间,例如:2023年6月输出2023-06")
+    implement_date: Optional[str] = Field(None,description="实施时间,例如:2023年6月输出2023-06")
+    drafting_organizations: Optional[str] = Field(None,description="起草单位")
+    drafters: Optional[str] = Field(None,description="起草人")

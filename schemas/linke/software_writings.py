@@ -8,13 +8,13 @@ class SoftwareWritings(BaseModel):
     不要输出 Schema 中未定义的字段。
     """
 
-    software_name: str = Field(
-        "",
+    software_name: Optional[str] = Field(
+        None,
         description="软件名称"
     )
 
-    registration_number: str = Field(
-        "",
+    registration_number: Optional[str] = Field(
+        None,
         description="登记号（软件著作权登记号）,输出格式如:2023SR0764084"
     )
 
@@ -28,17 +28,17 @@ class SoftwareWritings(BaseModel):
         )
     )
 
-    development_completion_date: str = Field(
-        "",
+    development_completion_date: Optional[str] = Field(
+        None,
         description="开发完成日期,输出格式如:2023-05-20"
     )
 
-    registration_date: str = Field(
-        "",
+    registration_date: Optional[str] = Field(
+        None,
         description="登记日期,输出格式如:2023-06-15"
     )
 
-    copyright_holders: List[str] = Field(
+    copyright_holders: Optional[List[str]] = Field(
         default_factory=list,
         description="著作权人列表,按原文正常阅读顺序提取并存储, 数组中每个字符串不包含空格"
     )

@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from schemas.taskconfig import TaskConfig
-from util.call_ollama import call_ollama_format,call_ollama
+from util.ollama import ollama_format_output,ollama_output
 import re
 from typing import List, Dict
 from util.marker_pdf import MarkerPDF
@@ -178,7 +178,7 @@ def _call_ollama_format(
         {"role": "user", "content": full_prompt}
     ]
 
-    return call_ollama_format(
+    return ollama_format_output(
         model=taskconfig.model,
         schema=schema,
         messages=messages,
@@ -219,7 +219,7 @@ def _call_ollama(
         {"role": "user", "content": full_prompt}
     ]
 
-    return call_ollama(
+    return ollama_output(
         model=taskconfig.model,
         messages=messages,
         temperature=taskconfig.temperature,
