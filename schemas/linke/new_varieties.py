@@ -19,7 +19,6 @@ class NewVarieties(BaseModel):
         None,
         description=(
         "品种状态代码。"
-        "只能返回一个整数，不要返回文字。"
         "取值范围："
         "1=申请，2=授权，3=转让"
         )
@@ -32,7 +31,7 @@ class NewVarieties(BaseModel):
 
     grant_date: Optional[str] = Field(
         None,
-        description="授权日期,输出格式如：2022-03-15、2022-03;未授权则为空字符串"
+        description="授权日期,输出格式如：2022-03-15、2022-03"
     )
 
     variety_right_holder: Optional[str] = Field(

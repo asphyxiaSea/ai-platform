@@ -55,9 +55,9 @@ def chat_text_pdfs_service(
     print(merged_text)
 
     # 4️⃣ Reduce（一次结构化）
-    return _call_ollama_format(
+    return _call_ollama(
         taskconfig=taskconfig,
-        texts=merged_text,
+        text=merged_text,
     )
 
 
@@ -130,7 +130,7 @@ f"""
 
         chunk_text = "\n".join(chunk_text_parts)
 
-        result = _call_ollama(
+        result = _call_ollama_chunk(
             taskconfig=taskconfig,
             texts=chunk_text,
         )
@@ -151,72 +151,85 @@ def merge_page_results(page_results: list[str]) -> str:
     return "\n\n".join(page_results)
 
 
-def _call_ollama_format(
+def _call_ollama(
     taskconfig: TaskConfig,
-    texts: str
+    text: str
 ) -> BaseModel:
 
-    schema = taskconfig.schema
-
+    # 1️⃣ 字段说明
     field_prompts = "\n".join(
         f"- {name}: {field.description}"
-        for name, field in schema.model_fields.items()
+        for name, field in taskconfig.schema.model_fields.items()
+        if field.description
     )
 
-    task_description = (schema.__doc__ or "").strip()
+    # 2️⃣ 任务说明（schema docstring）
+    task_description = (taskconfig.schema.__doc__ or "").strip()
 
-    full_prompt = f"""
-[任务说明]
+    # 3️⃣ system prompt：规则 + 约束
+    system_prompt = f"""
+【任务说明】
 {task_description}
-[字段提示]
+
+【字段定义】
 {field_prompts}
-[文档内容]
-{texts}
-"""
+""".strip()
+
+    user_prompt = f"""
+【文档内容】
+{text}
+""".strip()
 
     messages = [
-        {"role": "user", "content": full_prompt}
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt},
     ]
 
     return ollama_format_output(
         model=taskconfig.model,
-        schema=schema,
+        schema=taskconfig.schema,
         messages=messages,
         temperature=taskconfig.temperature,
     )
 
-def _call_ollama(
+
+
+def _call_ollama_chunk(
     taskconfig: TaskConfig,
     texts: str
 ) -> str:
 
-    schema = taskconfig.schema
-
-    field_prompts = ";".join(
+    field_prompts = "; ".join(
         f"{name}: {field.description}"
-        for name, field in schema.model_fields.items()
+        for name, field in taskconfig.schema.model_fields.items()
     )
 
-    full_prompt = f"""
-从下列中文文档中抽取关键信息要点。
+    system_prompt = f"""
+你是一个中文文档关键信息抽取助手。
 
-规则：
-1. 仅允许提取【以下字段范围】内的信息
-2. 仅当文档中明确出现时才提取
+【抽取规则】
+1. 仅允许抽取【字段范围】内的信息
+2. 仅当文档中明确出现时才抽取
 3. 不要总结、不要推理、不要补全
 4. 不要引入字段范围之外的信息
 
-字段范围：
+【字段范围】
 {field_prompts}
 
-输出：
-用一段简洁文本，只包含可直接对应到上述字段的原文信息片段。
+【输出要求】
+- 输出为一段简洁文本
+- 内容必须可直接对应到上述字段的原文信息片段
+- 不要输出解释、说明或无关内容
+""".strip()
+
+    user_prompt = f"""
 [文档内容]
 {texts}
-"""
+""".strip()
 
     messages = [
-        {"role": "user", "content": full_prompt}
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt},
     ]
 
     return ollama_output(

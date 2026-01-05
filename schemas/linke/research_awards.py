@@ -12,7 +12,7 @@ class ResearchAwards(BaseModel):
     )
     award_type: Optional[str] = Field(
         None,
-        description="奖励类型，例如‘科技进步奖’、‘自然科学奖’等。表示奖励的具体内容。"
+        description="奖励类型，例如‘科技进步奖’、‘自然科学奖’"
     )
     award_level: Optional[str] = Field(
         None,

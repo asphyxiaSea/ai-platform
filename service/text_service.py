@@ -1,7 +1,7 @@
 from typing import List
 from pydantic import BaseModel
 from schemas.taskconfig import TaskConfig
-from util.ollama import ollama_format_output
+from util.ollama import ollama_format_output,ollama_output
 from util.openai import openai_structure_output
 
 from util.marker_pdf import MarkerPDF

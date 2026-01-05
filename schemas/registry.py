@@ -45,12 +45,11 @@ SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     ),
     "ProjectApplication": TaskConfig(
         schema=ProjectApplication,
-        # task_mode=TaskMode.PDFTOTEXTBYCHUNK,
-        model="qwen3:latest",
+        # task_mode=TaskMode.PDFTOIMAGEBYCHUNK,
         marker_pdf=MarkerPDF(
             append_processor=["table"],
             page_range=list(range(0, 10)),
-            # filter_noisy=True,
+            filter_noisy=True,
         ),
     ),
 }

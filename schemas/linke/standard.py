@@ -15,7 +15,6 @@ class Standard(BaseModel):
         None,
         description=(
         "标准类型代码。"
-        "只能返回一个整数，不要返回文字。"
         "取值范围："
         "1=国家标准，2=行业标准，3=地方标准，4=团体标准"
         )
@@ -24,7 +23,6 @@ class Standard(BaseModel):
         None,
         description=(
         "标准状态代码。"
-        "只能返回一个整数，不要返回文字。"
         "取值范围："
         "1=发布，2=现行，3=废止"
         )

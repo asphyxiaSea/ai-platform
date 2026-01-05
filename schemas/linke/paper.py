@@ -20,7 +20,7 @@ class Paper(BaseModel):
 
     doi: Optional[str] = Field(
         None,
-        description="论文 DOI 号，如无则为空字符串"
+        description="论文DOI号"
     )
 
     journal_name: Optional[str] = Field(
