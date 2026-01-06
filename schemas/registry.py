@@ -27,6 +27,9 @@ SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     "ResearchAwards": TaskConfig(
         schema=ResearchAwards,
         task_mode=TaskMode.PDFTOTEXTANDIAMGE,
+        # markerpdf_config={
+        #     "output_format": "markdown"
+        # },
     ),
     "Paper": TaskConfig(
         schema=Paper,
@@ -41,7 +44,7 @@ SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     "Standard": TaskConfig(
         schema=Standard,
     ),
-    
+
     "ProjectApplication": TaskConfig(
         schema=ProjectApplication,
         model="qwen3:latest",

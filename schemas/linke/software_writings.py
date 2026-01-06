@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List,Optional
+from typing import List,Optional,Literal
 
 class SoftwareWritings(BaseModel):
     """
@@ -18,10 +18,10 @@ class SoftwareWritings(BaseModel):
         description="登记号（软件著作权登记号）"
     )
 
-    acquisition_method: Optional[int] = Field(
+    acquisition_method: Optional[Literal[1, 2]] = Field(
         None,
         description=(
-        "权利取得方式代码。"
+        "权利取得方式。"
         "取值范围："
         "1=原始取得，2=继受取得"
         )

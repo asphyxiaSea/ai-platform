@@ -12,7 +12,11 @@ class ResearchAwards(BaseModel):
     )
     award_type: Optional[str] = Field(
         None,
-        description="奖励类型，例如‘科技进步奖’、‘自然科学奖’"
+        description="奖励类型，例如‘科技技术进步奖’、‘自然科学奖’"
+    )
+    award_status: Optional[str] = Field(
+        None,
+        description="奖励状态，例如：申报、获奖"
     )
     award_level: Optional[str] = Field(
         None,
@@ -21,4 +25,8 @@ class ResearchAwards(BaseModel):
     Awardee: Optional[List[str]] = Field(
         default_factory=list,
         description="获奖者列表，包含所有参与该奖项申报或获得该奖项的人员姓名。"
+    )
+    application_date: Optional[str] = Field(
+        None,
+        description="时间，输出格式如:2020-05"
     )
