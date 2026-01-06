@@ -1,10 +1,10 @@
+import re
+from io import BytesIO
+from typing import List, Dict
 from pydantic import BaseModel
 from schemas.taskconfig import TaskConfig
 from util.ollama import ollama_format_output,ollama_output
-import re
-from typing import List, Dict
-from util.marker_pdf import MarkerPDF
-from io import BytesIO
+from util.marker_pdf import extract_pdf
 
 PAGE_RE = re.compile(r"^\{(\d+)\}-+$")
 
@@ -19,18 +19,12 @@ def chat_text_pdfs_service(
     if not pdf_bytes_list:
         return taskconfig.schema.model_validate({})
 
-    # 1️⃣ marker-pdf 初始化
-    if taskconfig.marker_pdf is None:
-        taskconfig.marker_pdf = MarkerPDF()
 
     all_page_results: list[str] = []
 
     # 2️⃣ 每个 PDF 独立 Map
     for pdf_idx, pdf_bytes in enumerate(pdf_bytes_list, start=1):
-
-        raw_text = taskconfig.marker_pdf.extract_text(
-            BytesIO(pdf_bytes)
-        )
+        raw_text = extract_pdf(pdf=BytesIO(pdf_bytes),config=taskconfig.markerpdf_config)
 
         page_results = map_extract_pages(
             taskconfig=taskconfig,

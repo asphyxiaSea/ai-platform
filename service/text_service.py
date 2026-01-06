@@ -3,24 +3,36 @@ from pydantic import BaseModel
 from schemas.taskconfig import TaskConfig
 from util.ollama import ollama_format_output,ollama_output
 from util.openai import openai_structure_output
-
-from util.marker_pdf import MarkerPDF
+from util.marker_pdf import extract_pdf
 from io import BytesIO
 
 def chat_texts_pdfs_services(
     taskconfig:TaskConfig,
     pdf_bytes_list: List[bytes]
+) -> BaseModel:
+    results: List[BaseModel] = []
+    for idx, pdf_bytes in enumerate(pdf_bytes_list):
+        text = extract_pdf(pdf=BytesIO(pdf_bytes),config=taskconfig.markerpdf_config)
+        results.append(_call_ollama(
+            taskconfig=taskconfig,
+            text=text
+        ))
+    return results[0]
+
+
+def chat_texts_pdfs_services_list(
+    taskconfig:TaskConfig,
+    pdf_bytes_list: List[bytes]
 ) -> List[BaseModel]:
     results: List[BaseModel] = []
-    if taskconfig.marker_pdf is None:
-        taskconfig.marker_pdf = MarkerPDF()
     for idx, pdf_bytes in enumerate(pdf_bytes_list):
-        text = taskconfig.marker_pdf.extract_text(BytesIO(pdf_bytes))
+        text = extract_pdf(pdf=BytesIO(pdf_bytes),config=taskconfig.markerpdf_config)
         results.append(_call_ollama(
             taskconfig=taskconfig,
             text=text
         ))
     return results
+
 
 
 def _call_ollama(
@@ -77,7 +89,7 @@ def _call_openai(
         },
         {
             "role": "user", 
-            "content": f"请从以下文本中提取专利信息：\n\n{text}"
+            "content": f"请从以下文本中提取信息：\n\n{text}"
         },
     ]
 

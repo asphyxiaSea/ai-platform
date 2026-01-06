@@ -9,6 +9,28 @@ from util.pdf_utils import pdf_bytes_to_base64_images,image_bytes_to_base64
 def chat_multimodal_images_services(
     taskconfig: TaskConfig,
     image_bytes_list: List[bytes]
+) -> BaseModel:
+
+    if not image_bytes_list:
+        raise HTTPException(400, "image_bytes_list is required")
+
+    results: List[BaseModel] = []
+
+    for idx, image_bytes in enumerate(image_bytes_list, start=1):
+        image_base64 = image_bytes_to_base64(image_bytes)
+
+        result = _call_multimodal_ollama(
+            taskconfig=taskconfig,
+            image_base64=image_base64
+        )
+
+        results.append(result)
+
+    return results[0]
+
+def chat_multimodal_images_services_list(
+    taskconfig: TaskConfig,
+    image_bytes_list: List[bytes]
 ) -> List[BaseModel]:
 
     if not image_bytes_list:
@@ -28,7 +50,31 @@ def chat_multimodal_images_services(
 
     return results
 
+
 def chat_multimodal_pdfs_services(
+    taskconfig: TaskConfig,
+    pdf_bytes_list: List[bytes]
+) -> BaseModel:
+
+    if not pdf_bytes_list:
+        raise HTTPException(400, "pdf_bytes_list is required")
+
+    results: List[BaseModel] = []
+
+    for idx, pdf_bytes in enumerate(pdf_bytes_list, start=1):
+        images_base64 = pdf_bytes_to_base64_images(pdf_bytes)
+        for image_base64 in images_base64:
+            # 每个 PDF 单独调用一次
+            result = _call_multimodal_ollama(
+                taskconfig=taskconfig,
+                image_base64=image_base64
+            )
+
+        results.append(result)
+
+    return results[0]
+
+def chat_multimodal_pdfs_services_list(
     taskconfig: TaskConfig,
     pdf_bytes_list: List[bytes]
 ) -> List[BaseModel]:
