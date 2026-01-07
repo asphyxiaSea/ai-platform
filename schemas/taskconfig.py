@@ -19,7 +19,7 @@ class TaskConfig:
         # 模型保守程度，越高越不保守
         temperature: float = 0.0,
         max_tokens: int = 2048,
-        task_mode: TaskMode = TaskMode.PDFTOTEXT,
+        task_mode: TaskMode = TaskMode.PDFTOTEXTANDIAMGE,
         # 修改marker-pdf配置
         markerpdf_config: dict[str, Any] | None = None,
     ):

@@ -8,7 +8,14 @@ class NewVarieties(BaseModel):
     不要输出 Schema 中未定义的字段。
     """
 
-    variety_name: Optional[str] = Field(None,description="品种名称")
+    variety_name: Optional[str] = Field(
+        None, description="品种名称"
+    )
+
+    species: Optional[str] = Field(
+        None,
+        description="所属的种和属"
+    )
 
     variety_right_number: Optional[str] = Field(
         None,
@@ -18,9 +25,9 @@ class NewVarieties(BaseModel):
     variety_status: Optional[int] = Field(
         None,
         description=(
-        "品种状态代码。"
-        "取值范围："
-        "1=申请，2=授权，3=转让"
+            "品种状态代码。"
+            "取值范围："
+            "1=申请，2=授权，3=转让"
         )
     )
 

@@ -19,27 +19,22 @@ SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     ),
     "NewVarieties": TaskConfig(
         schema=NewVarieties,
-        task_mode=TaskMode.IMAGE,
     ),
     "SoftwareWritings": TaskConfig(
         schema=SoftwareWritings,
     ),
     "ResearchAwards": TaskConfig(
         schema=ResearchAwards,
-        task_mode=TaskMode.PDFTOTEXTANDIAMGE,
-        # markerpdf_config={
-        #     "output_format": "markdown"
-        # },
     ),
     "Paper": TaskConfig(
         schema=Paper,
         markerpdf_config={
-            "page_range": list(range(0, 4)),
+            "output_format": "markdown",
+            "page_range": "0,1,2,3",
     },
     ),
     "ImprovedVariety": TaskConfig(
         schema=ImprovedVariety,
-        task_mode=TaskMode.IMAGE,
     ),
     "Standard": TaskConfig(
         schema=Standard,
@@ -48,8 +43,8 @@ SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     "ProjectApplication": TaskConfig(
         schema=ProjectApplication,
         model="qwen3:latest",
-        # task_mode=TaskMode.PDFTOIMAGEBYCHUNK,
         markerpdf_config={
+            "output_format": "markdown",
             "page_range": list(range(0, 10)),
         },
     ),
