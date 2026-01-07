@@ -172,12 +172,3 @@ class MarkerPDF:
         return text
 
 # 基于行长度的文本降噪 / 粗粒度内容筛选（heuristic filter）
-def filter_noisy(full_text: str) -> str:
-    lines = full_text.splitlines()
-    # 排除正文
-    info_lines = [
-        l for l in lines
-        if 5 <= len(l) <= 200
-    ]
-
-    return "\n".join(info_lines) + "\n"

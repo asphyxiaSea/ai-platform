@@ -1,9 +1,9 @@
 from typing import List
 from pydantic import BaseModel
 from schemas.taskconfig import TaskConfig
-from util.ollama import ollama_format_output,ollama_output
+from util.ollama import ollama_format_output
 from util.openai import openai_structure_output
-from util.marker_pdf import extract_pdf
+from util.marker_pdf import extract_pdf,filter_noisy
 from io import BytesIO
 
 def chat_texts_pdfs_services(
@@ -12,7 +12,9 @@ def chat_texts_pdfs_services(
 ) -> BaseModel:
     results: List[BaseModel] = []
     for idx, pdf_bytes in enumerate(pdf_bytes_list):
-        text = extract_pdf(pdf=BytesIO(pdf_bytes),config=taskconfig.markerpdf_config)
+        text = extract_pdf(pdf=BytesIO(pdf_bytes),markerpdf=taskconfig.markerpdf)
+        if taskconfig.filter_noisy:
+            text =filter_noisy(text)
         results.append(_call_ollama(
             taskconfig=taskconfig,
             text=text
@@ -26,7 +28,7 @@ def chat_texts_pdfs_services_list(
 ) -> List[BaseModel]:
     results: List[BaseModel] = []
     for idx, pdf_bytes in enumerate(pdf_bytes_list):
-        text = extract_pdf(pdf=BytesIO(pdf_bytes),config=taskconfig.markerpdf_config)
+        text = extract_pdf(pdf=BytesIO(pdf_bytes),markerpdf=taskconfig.markerpdf)
         results.append(_call_ollama(
             taskconfig=taskconfig,
             text=text
