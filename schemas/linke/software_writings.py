@@ -15,7 +15,7 @@ class SoftwareWritings(BaseModel):
 
     registration_number: Optional[str] = Field(
         None,
-        description="登记号（软件著作权登记号）"
+        description="登记号,注意：不是证书号，输出格式类似于：2023SR0764084"
     )
 
     acquisition_method: Optional[Literal[1, 2]] = Field(

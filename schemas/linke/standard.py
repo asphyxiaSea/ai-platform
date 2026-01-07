@@ -8,8 +8,8 @@ class Standard(BaseModel):
     不要输出 Schema 中未定义的字段。
     """
 
-    standard_name: Optional[str] = Field(None,description="标准名称")
-    standard_code: Optional[str] = Field(None,description="标准号")
+    standard_name: Optional[str] = Field(None,description="标准的名称")
+    standard_code: Optional[str] = Field(None,description="标准号,类似的格式为：DB45/T 1257—2015")
 
     standard_type: Optional[int] = Field(
         None,

@@ -41,7 +41,8 @@ SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     "Standard": TaskConfig(
         schema=Standard,
         markerpdf=MarkerPDF(
-            remove_processors=["table"]
+            remove_processors=["table"],
+            page_range=list(range(0, 3)),
         )
     ),
 

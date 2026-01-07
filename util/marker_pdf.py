@@ -138,7 +138,7 @@ def extract_pdf(
         url,
         files={"file": (filename, pdf_io, "application/pdf")},
         data=data,
-        timeout=100,
+        timeout=200,
     )
 
     resp.raise_for_status()
