@@ -26,12 +26,12 @@ class Patent(BaseModel):
 
     application_date: Optional[str] = Field(
         None,
-        description="专利申请时间，输出格式：2022-05"
+        description="专利申请时间，输出格式：2022-05-01"
     )
 
     grant_date: Optional[str] = Field(
         None,
-        description="专利授权时间，输出格式：2023-08"
+        description="专利授权时间，输出格式：2023-08-01"
     )
 
     project: Optional[str] = Field(

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Optional, Literal
 class ResearchAwards(BaseModel):
     """
     你是一个中文科研奖励信息结构化抽取助手，提取markdown格式的文本信息。
@@ -14,9 +14,9 @@ class ResearchAwards(BaseModel):
         None,
         description="奖励类型，例如‘科技技术进步奖’、‘自然科学奖’"
     )
-    award_status: Optional[str] = Field(
+    award_status: Optional[Literal[1, 2]]= Field(
         None,
-        description="奖励状态，例如：申报、获奖"
+        description="奖励状态，例如：1=申报、2=获奖"
     )
     award_level: Optional[str] = Field(
         None,

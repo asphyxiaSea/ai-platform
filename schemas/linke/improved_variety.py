@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional, Literal
+from typing import Optional, Literal,List
 
 class ImprovedVariety(BaseModel):
     """
@@ -21,4 +21,4 @@ class ImprovedVariety(BaseModel):
     )
     approval_date: Optional[str] = Field(None,description="认定或审定日期")
     applicant: Optional[str] = Field(None,description="申请人")
-    breeder: Optional[str] = Field(None,description="选育人")
+    breeder: Optional[List[str]] = Field(None,description="选育人,注意：有些文本种选育人是用、隔开")

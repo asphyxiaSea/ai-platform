@@ -40,6 +40,9 @@ SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     ),
     "Standard": TaskConfig(
         schema=Standard,
+        markerpdf=MarkerPDF(
+            remove_processors=["table"]
+        )
     ),
 
     "ProjectApplication": TaskConfig(
