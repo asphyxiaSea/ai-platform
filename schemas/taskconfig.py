@@ -20,7 +20,6 @@ class TaskConfig:
         # 模型保守程度，越高越不保守
         temperature: float = 0.0,
         max_tokens: int = 2048,
-        filter_noisy: bool = False,
         task_mode: TaskMode = TaskMode.PDFTOTEXTANDIAMGE,
         # 修改marker-pdf配置
         markerpdf: MarkerPDF | None = None,
@@ -31,7 +30,6 @@ class TaskConfig:
         self.vl_model = vl_model
         self.temperature = temperature
         self.max_tokens = max_tokens
-        self.filter_noisy = filter_noisy
         self.task_mode = task_mode
         self.markerpdf = markerpdf
         self.markerpdf_config = markerpdf_config

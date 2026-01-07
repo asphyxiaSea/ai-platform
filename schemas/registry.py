@@ -29,9 +29,9 @@ SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     ),
     "Paper": TaskConfig(
         schema=Paper,
-        filter_noisy=True,
         markerpdf=MarkerPDF(
             page_range=list(range(0, 10)),
+            filter_noisy=True,
             remove_processors=["table"]
         )
     ),

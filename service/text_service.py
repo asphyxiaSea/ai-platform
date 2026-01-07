@@ -13,8 +13,6 @@ def chat_texts_pdfs_services(
     results: List[BaseModel] = []
     for idx, pdf_bytes in enumerate(pdf_bytes_list):
         text = extract_pdf(pdf=BytesIO(pdf_bytes),markerpdf=taskconfig.markerpdf)
-        if taskconfig.filter_noisy:
-            text =filter_noisy(text)
         results.append(_call_ollama(
             taskconfig=taskconfig,
             text=text

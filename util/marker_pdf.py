@@ -71,12 +71,14 @@ class MarkerPDF:
         page_range: list[int] | None = None,
         extract_images: bool = False,
         output_format: str = "markdown",
+        filter_noisy: bool = False,
         remove_processors: list[str] | None = None,
         append_processors: list[str] | None = None,
     ):
         self.page_range = page_range
         self.extract_images = extract_images
         self.output_format = output_format
+        self.filter_noisy = filter_noisy
         self.remove_processors = remove_processors
         self.append_processors = append_processors
 
@@ -140,7 +142,10 @@ def extract_pdf(
     )
 
     resp.raise_for_status()
-    return resp.json()["text"]
+    if markerpdf is not None and markerpdf.filter_noisy:
+        return filter_noisy(resp.json()["text"])
+    else:
+        return resp.json()["text"]
 
 
 
