@@ -30,9 +30,8 @@ SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     "Paper": TaskConfig(
         schema=Paper,
         markerpdf=MarkerPDF(
-            page_range=list(range(0, 10)),
+            page_range=list(range(0, 4)),
             filter_noisy=True,
-            remove_processors=["table"]
         )
     ),
     "ImprovedVariety": TaskConfig(
@@ -41,8 +40,8 @@ SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     "Standard": TaskConfig(
         schema=Standard,
         markerpdf=MarkerPDF(
-            remove_processors=["table"],
-            page_range=list(range(0, 3)),
+            filter_noisy=True,
+            page_range=list(range(0, 4)),
         )
     ),
 

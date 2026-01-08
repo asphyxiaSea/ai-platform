@@ -148,13 +148,32 @@ def extract_pdf(
         return resp.json()["text"]
 
 
+import re
 
 def filter_noisy(full_text: str) -> str:
     lines = full_text.splitlines()
-    # 排除正文
+
+    # 按长度过滤
     info_lines = [
         l for l in lines
         if 5 <= len(l) <= 200
     ]
 
-    return "\n".join(info_lines) + "\n"
+    text = "\n".join(info_lines)
+
+    # ✅ 1️⃣ 统一标准号分隔符
+    text = (
+        text
+        .replace("—", "-")   # em dash
+        .replace("–", "-")   # en dash
+        .replace("－", "-")  # 全角减号
+    )
+
+    # ✅ 2️⃣ 去除中文字符之间的空格
+    zh = r'[\u4e00-\u9fff]'
+    pattern = re.compile(f'({zh})\\s+({zh})')
+
+    while pattern.search(text):
+        text = pattern.sub(r'\1\2', text)
+
+    return text + "\n"
