@@ -18,7 +18,7 @@ class TaskConfig:
         model: str="gemma3:latest",
         vl_model:str="qwen3-vl:latest",
         # 模型保守程度，越高越不保守
-        temperature: float = 0.0,
+        temperature: float = 0.1,
         max_tokens: int = 2048,
         task_mode: TaskMode = TaskMode.PDFTOTEXTANDIAMGE,
         # 修改marker-pdf配置

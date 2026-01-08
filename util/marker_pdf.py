@@ -1,7 +1,8 @@
 import io
 import json
 import requests
-from typing import Any, Optional, Union
+from typing import Any,  Union
+from pypdf import PdfReader
 
 DEFAULT_PROCESSORS: dict[str, str] = {
     # ===== 基础顺序 / 结构 =====
@@ -82,6 +83,24 @@ class MarkerPDF:
         self.remove_processors = remove_processors
         self.append_processors = append_processors
 
+    def normalize_page_range(self, page_count: int) -> list[int] | None:
+        if not self.page_range or page_count <= 0:
+            self.page_range = None
+            return None
+
+        safe_pages: list[int] = []
+
+        for p in self.page_range:
+            if p < 0:
+                p = 0
+            elif p >= page_count:
+                p = page_count - 1
+
+            safe_pages.append(p)
+
+        self.page_range = sorted(set(safe_pages))
+        return self.page_range
+
     def to_config(self) -> dict[str, Any]:
         cfg = {
             "output_format": self.output_format,
@@ -94,7 +113,7 @@ class MarkerPDF:
     def to_processor_list(self) -> list[str] | None:
         # ---- 1️⃣ remove 校验 ----
         if self.remove_processors:
-            invalid = set(self.remove_processors) - set(DEFAULT_PROCESSORS)
+            invalid = set(self.remove_processors) - set(DEFAULT_PROCESSORS_NAME)
             if invalid:
                 raise ValueError(
                     f"Unknown processors in remove_processors: {invalid}"
@@ -102,7 +121,7 @@ class MarkerPDF:
 
         # ---- 2️⃣ append 校验 ----
         if self.append_processors:
-            invalid = set(self.append_processors) - set(self.append_processors)
+            invalid = set(self.append_processors) - set(DEFAULT_PROCESSORS)
             if invalid:
                 raise ValueError(
                     f"Unknown processors in append_processors: {invalid}"
@@ -127,42 +146,58 @@ class MarkerPDF:
             for name in processor_names
         ]
         return processor_list
+    
+
 
 def extract_pdf(
     *,
     pdf: Union[str, io.BytesIO],
     markerpdf: MarkerPDF | None = None,
 ) -> str:
-    url = "http://localhost:8004/marker-pdf/extract"
+    url = "http://localhost:8006/marker-pdf/extract"
 
+    # 1️⃣ 统一读成 bytes（唯一真相源）
     if isinstance(pdf, str):
         with open(pdf, "rb") as f:
-            pdf_io = io.BytesIO(f.read())
+            pdf_bytes = f.read()
         filename = pdf.split("/")[-1]
     else:
-        pdf_io = pdf
+        pdf.seek(0)
+        pdf_bytes = pdf.read()
         filename = "input.pdf"
 
     data = {}
 
+    # 2️⃣ 所有“读取”行为都用新的 BytesIO
     if markerpdf is not None:
+        reader = PdfReader(io.BytesIO(pdf_bytes))
+        page_count = len(reader.pages)
+
+        markerpdf.normalize_page_range(page_count)
+
         data["config"] = json.dumps(markerpdf.to_config(), ensure_ascii=False)
         processor_list = markerpdf.to_processor_list()
         if processor_list is not None:
             data["processor_list"] = json.dumps(processor_list, ensure_ascii=False)
 
+    # 3️⃣ 上传时也用新的 BytesIO
     resp = requests.post(
         url,
-        files={"file": (filename, pdf_io, "application/pdf")},
+        files={
+            "file": (
+                filename,
+                io.BytesIO(pdf_bytes),
+                "application/pdf",
+            )
+        },
         data=data,
         timeout=200,
     )
 
     resp.raise_for_status()
-    if markerpdf is not None and markerpdf.filter_noisy is not True:
-        return resp.json()["text"]
-    else:
-        return filter_noisy(resp.json()["text"])
+
+    text = resp.json()["text"]
+    return text if markerpdf and not markerpdf.filter_noisy else filter_noisy(text)
 
 
 import re
