@@ -29,5 +29,5 @@ class Standard(BaseModel):
     )
     publish_date: Optional[str] = Field(None,description="发布时间,例如:2023年6月输出2023-06")
     implement_date: Optional[str] = Field(None,description="实施时间,例如:2023年6月输出2023-06")
-    drafting_organizations: Optional[str] = Field(None,description="起草单位")
+    drafting_organizations: Optional[List[str]] = Field(default_factory=list,description="起草单位")
     drafters: Optional[List[str]] = Field(default_factory=list,description="起草人")

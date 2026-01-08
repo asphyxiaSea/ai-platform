@@ -71,7 +71,7 @@ class MarkerPDF:
         page_range: list[int] | None = None,
         extract_images: bool = False,
         output_format: str = "markdown",
-        filter_noisy: bool = False,
+        filter_noisy: bool = True,
         remove_processors: list[str] | None = None,
         append_processors: list[str] | None = None,
     ):
@@ -126,24 +126,7 @@ class MarkerPDF:
             DEFAULT_PROCESSORS[name]
             for name in processor_names
         ]
-        print(processor_list)
         return processor_list
-
-        # processor_names = [
-        #     p for p in DEFAULT_PROCESSORS_NAME
-        #     if p not in (self.remove_processors or [])
-        # ]
-
-        # if self.append_processors:
-        #     for p in self.append_processors:
-        #         if p not in processor_names:
-        #             processor_names.append(p)
-
-        # return [
-        #     DEFAULT_PROCESSORS[name]
-        #     for name in processor_names
-        # ]
-
 
 def extract_pdf(
     *,
@@ -176,10 +159,10 @@ def extract_pdf(
     )
 
     resp.raise_for_status()
-    if markerpdf is not None and markerpdf.filter_noisy:
-        return filter_noisy(resp.json()["text"])
-    else:
+    if markerpdf is not None and markerpdf.filter_noisy is not True:
         return resp.json()["text"]
+    else:
+        return filter_noisy(resp.json()["text"])
 
 
 import re

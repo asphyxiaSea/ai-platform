@@ -13,6 +13,7 @@ from util import MarkerPDF
 
 SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     "Patent": TaskConfig(
+        temperature=0.1,
         schema=Patent,
     ),
     "MonoGraph": TaskConfig(
@@ -26,6 +27,7 @@ SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     ),
     "ResearchAwards": TaskConfig(
         schema=ResearchAwards,
+        temperature=0.1
     ),
     "Paper": TaskConfig(
         schema=Paper,
@@ -39,6 +41,7 @@ SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     ),
     "Standard": TaskConfig(
         schema=Standard,
+        temperature=0.1,
         markerpdf=MarkerPDF(
             filter_noisy=True,
             page_range=list(range(0, 4)),
