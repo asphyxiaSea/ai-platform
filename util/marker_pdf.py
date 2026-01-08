@@ -92,23 +92,57 @@ class MarkerPDF:
         return cfg
 
     def to_processor_list(self) -> list[str] | None:
-        if not self.remove_processors and not self.append_processors:
-            return None
+        # ---- 1️⃣ remove 校验 ----
+        if self.remove_processors:
+            invalid = set(self.remove_processors) - set(DEFAULT_PROCESSORS)
+            if invalid:
+                raise ValueError(
+                    f"Unknown processors in remove_processors: {invalid}"
+                )
 
+        # ---- 2️⃣ append 校验 ----
+        if self.append_processors:
+            invalid = set(self.append_processors) - set(self.append_processors)
+            if invalid:
+                raise ValueError(
+                    f"Unknown processors in append_processors: {invalid}"
+                )
+
+        # ---- 3️⃣ 构建 pipeline（先 remove）----
+        ignored = set(self.remove_processors or [])
         processor_names = [
-            p for p in DEFAULT_PROCESSORS_NAME
-            if p not in (self.remove_processors or [])
+            name for name in DEFAULT_PROCESSORS_NAME
+            if name not in ignored
         ]
 
+        # ---- 4️⃣ append ----
         if self.append_processors:
-            for p in self.append_processors:
-                if p not in processor_names:
-                    processor_names.append(p)
+            for name in self.append_processors:
+                if name not in processor_names:
+                    processor_names.append(name)
 
-        return [
+        # ---- 5️⃣ 映射为 processor 类 ----
+        processor_list = [
             DEFAULT_PROCESSORS[name]
             for name in processor_names
         ]
+        print(processor_list)
+        return processor_list
+
+        # processor_names = [
+        #     p for p in DEFAULT_PROCESSORS_NAME
+        #     if p not in (self.remove_processors or [])
+        # ]
+
+        # if self.append_processors:
+        #     for p in self.append_processors:
+        #         if p not in processor_names:
+        #             processor_names.append(p)
+
+        # return [
+        #     DEFAULT_PROCESSORS[name]
+        #     for name in processor_names
+        # ]
 
 
 def extract_pdf(
