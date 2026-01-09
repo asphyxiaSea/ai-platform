@@ -21,6 +21,7 @@ def marker_services(
         results.append(result)
 
     # 当前逻辑：只取第一个（如果这是你 schema 设计决定的）
+    
     return results[0]
 
 def _call_ollama(

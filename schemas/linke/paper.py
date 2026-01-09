@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Literal
 from pydantic import BaseModel, Field
 
 class Paper(BaseModel):
@@ -13,9 +13,11 @@ class Paper(BaseModel):
         description="论文题目"
     )
 
-    paper_status: Optional[int] = Field(
-        None,
-        description="论文状态，例如：1=已录用,2=已发表"
+    paper_status: Literal[1, 2] = Field(
+        2,
+        description=(
+            "论文状态:1=已录用(仅当文本中明确出现“录用 / accepted”等字样时填写),2=已发表"
+        )
     )
 
     doi: Optional[str] = Field(

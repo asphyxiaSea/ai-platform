@@ -23,7 +23,7 @@ class ResearchAwards(BaseModel):
 
     award_status: Optional[Literal[1, 2]] = Field(
         None,
-        description="奖励状态：1=申报，2=获奖"
+        description="奖励状态，注意获奖证书都是已获奖：1=申报，2=获奖"
     )
 
     award_level: Literal["国家级", "省部级", "部级"]= Field(
