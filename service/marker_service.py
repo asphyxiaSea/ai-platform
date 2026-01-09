@@ -4,20 +4,24 @@ from domain.task_config import TaskConfig
 from util.ollama import ollama_format_output
 from util.openai import openai_structure_output
 from domain.marker import extract_pdf,extract_file
+from domain.file_item import FileItem
 from io import BytesIO
 
-def chat_texts_pdfs_services(
-    taskconfig:TaskConfig,
-    pdf_bytes_list: List[bytes]
+def marker_services(
+    taskconfig: TaskConfig,
+    file_items: list[FileItem],
 ) -> BaseModel:
+
     results: List[BaseModel] = []
-    for idx, pdf_bytes in enumerate(pdf_bytes_list):
-        text = extract_pdf(pdf=BytesIO(pdf_bytes),marker=taskconfig.marker)
-        # print(text)
-        results.append(_call_ollama(
-            taskconfig=taskconfig,
-            text=text
-        ))
+
+    for file in file_items:
+        # 1. marker → text
+        text = extract_pdf(pdf=BytesIO(file.data),marker=taskconfig.marker,)
+        # 3. text → LLM
+        result = _call_ollama(taskconfig=taskconfig, text=text,)
+        results.append(result)
+
+    # 当前逻辑：只取第一个（如果这是你 schema 设计决定的）
     return results[0]
 
 
@@ -33,20 +37,6 @@ def chat_texts_pdfs_services_list(
             text=text
         ))
     return results
-
-def chat_texts_images_services(
-    taskconfig:TaskConfig,
-    image_bytes_list: List[bytes]
-) -> BaseModel:
-    results: List[BaseModel] = []
-    for idx, image_bytes in enumerate(image_bytes_list):
-        text = extract_file(file=BytesIO(image_bytes),marker=taskconfig.marker)
-        results.append(_call_ollama(
-            taskconfig=taskconfig,
-            text=text
-        ))
-    return results[0]
-
 
 def _call_ollama(
     taskconfig: TaskConfig,

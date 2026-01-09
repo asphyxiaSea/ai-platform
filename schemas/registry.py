@@ -20,7 +20,6 @@ SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     ),
     "NewVarieties": TaskConfig(
         schema=NewVarieties,
-        task_mode=TaskMode.IMAGETOTEXT,
     ),
     "SoftwareWritings": TaskConfig(
         schema=SoftwareWritings,
