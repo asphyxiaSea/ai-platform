@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from schemas.taskconfig import TaskConfig
 from util.ollama import ollama_format_output
 from util.openai import openai_structure_output
-from util.marker_pdf import extract_pdf
+from util.marker import extract_pdf,extract_file
 from io import BytesIO
 
 def chat_texts_pdfs_services(
@@ -12,7 +12,8 @@ def chat_texts_pdfs_services(
 ) -> BaseModel:
     results: List[BaseModel] = []
     for idx, pdf_bytes in enumerate(pdf_bytes_list):
-        text = extract_pdf(pdf=BytesIO(pdf_bytes),markerpdf=taskconfig.markerpdf)
+        text = extract_pdf(pdf=BytesIO(pdf_bytes),marker=taskconfig.marker)
+        # print(text)
         results.append(_call_ollama(
             taskconfig=taskconfig,
             text=text
@@ -26,13 +27,26 @@ def chat_texts_pdfs_services_list(
 ) -> List[BaseModel]:
     results: List[BaseModel] = []
     for idx, pdf_bytes in enumerate(pdf_bytes_list):
-        text = extract_pdf(pdf=BytesIO(pdf_bytes),markerpdf=taskconfig.markerpdf)
-
+        text = extract_pdf(pdf=BytesIO(pdf_bytes),marker=taskconfig.marker)
         results.append(_call_ollama(
             taskconfig=taskconfig,
             text=text
         ))
     return results
+
+def chat_texts_images_services(
+    taskconfig:TaskConfig,
+    image_bytes_list: List[bytes]
+) -> BaseModel:
+    results: List[BaseModel] = []
+    for idx, image_bytes in enumerate(image_bytes_list):
+        text = extract_file(file=BytesIO(image_bytes),marker=taskconfig.marker)
+        # print(text)
+        results.append(_call_ollama(
+            taskconfig=taskconfig,
+            text=text
+        ))
+    return results[0]
 
 
 def _call_ollama(

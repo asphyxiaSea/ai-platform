@@ -1,11 +1,12 @@
 from typing import Type,Any
 from pydantic import BaseModel
 from enum import Enum
-from util import MarkerPDF
+from util import Marker
 
 class TaskMode(Enum):
     IMAGE = "image"
     PDFTOTEXT = "pdftotext"
+    IMAGETOTEXT = "imagetotext"
     PDFTOIMAGE = "pdftoimage"
     PDFTOTEXTANDIAMGE = "pdftotextandimage"
     PDFTOTEXTBYCHUNK = "pdftotextbychunk"
@@ -22,8 +23,7 @@ class TaskConfig:
         max_tokens: int = 2048,
         task_mode: TaskMode = TaskMode.PDFTOTEXTANDIAMGE,
         # 修改marker-pdf配置
-        markerpdf: MarkerPDF | None = None,
-        markerpdf_config: dict[str, Any] | None = None,
+        marker: Marker | None = None,
     ):
         self.schema = schema
         self.model = model
@@ -31,5 +31,4 @@ class TaskConfig:
         self.temperature = temperature
         self.max_tokens = max_tokens
         self.task_mode = task_mode
-        self.markerpdf = markerpdf
-        self.markerpdf_config = markerpdf_config
+        self.marker = marker

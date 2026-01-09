@@ -1,7 +1,7 @@
 from schemas.registry import SCHEMA_REGISTRY
 from schemas.taskconfig import TaskMode
 from service.multimodal_service import chat_multimodal_images_services,chat_multimodal_pdfs_services
-from service.text_service import chat_texts_pdfs_services
+from service.text_service import chat_texts_pdfs_services,chat_texts_images_services
 from service.text_chunk_service import chat_text_pdfs_service
 from service.multimodal_chunk_service import chat_pdfs_images_services
 
@@ -26,10 +26,18 @@ async def chat_extract_service(
             taskconfig=taskconfig,
             pdf_bytes_list=pdf_bytes_list,
         )
+    # -------- image转纯文本 --------
+    elif taskconfig.task_mode == TaskMode.IMAGETOTEXT:
+        if not image_bytes_list:
+            raise ValueError("This schema requires images input")
+        return chat_texts_images_services(
+            taskconfig=taskconfig,
+            image_bytes_list=image_bytes_list,
+        )
     # -------- image多模态 --------
     elif taskconfig.task_mode == TaskMode.IMAGE:
         if not image_bytes_list:
-            raise ValueError("This schema requires image input")
+            raise ValueError("This schema requires images input")
         return chat_multimodal_images_services(
             taskconfig=taskconfig,
             image_bytes_list=image_bytes_list,
@@ -37,7 +45,7 @@ async def chat_extract_service(
     # -------- pdftoimage多模态 --------
     elif taskconfig.task_mode == TaskMode.PDFTOIMAGE:
         if not pdf_bytes_list:
-            raise ValueError("This schema requires pdf input")
+            raise ValueError("This schema requires pdfs input")
         return chat_multimodal_pdfs_services(
             taskconfig=taskconfig,
             pdf_bytes_list=pdf_bytes_list,
@@ -57,7 +65,7 @@ async def chat_extract_service(
     # -------- PDF转纯文本+分页 --------  
     elif taskconfig.task_mode == TaskMode.PDFTOTEXTBYCHUNK:
         if not pdf_bytes_list:
-            raise ValueError("This schema requires pdf input")
+            raise ValueError("This schema requires pdfs input")
         return chat_text_pdfs_service(
             taskconfig=taskconfig,
             pdf_bytes_list=pdf_bytes_list,
@@ -65,7 +73,7 @@ async def chat_extract_service(
     # -------- PDF转纯图像+分页 --------  
     elif taskconfig.task_mode == TaskMode.PDFTOIMAGEBYCHUNK:
         if not pdf_bytes_list:
-            raise ValueError("This schema requires pdf input")
+            raise ValueError("This schema requires pdfs input")
         return chat_pdfs_images_services(
             taskconfig=taskconfig,
             pdf_bytes_list=pdf_bytes_list,

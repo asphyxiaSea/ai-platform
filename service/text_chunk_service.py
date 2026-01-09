@@ -4,7 +4,7 @@ from typing import List, Dict
 from pydantic import BaseModel
 from schemas.taskconfig import TaskConfig
 from util.ollama import ollama_format_output,ollama_output
-from util.marker_pdf import extract_pdf
+from util.marker import extract_pdf
 
 PAGE_RE = re.compile(r"^\{(\d+)\}-+$")
 
@@ -24,7 +24,7 @@ def chat_text_pdfs_service(
 
     # 2️⃣ 每个 PDF 独立 Map
     for pdf_idx, pdf_bytes in enumerate(pdf_bytes_list, start=1):
-        raw_text = extract_pdf(pdf=BytesIO(pdf_bytes),markerpdf=taskconfig.markerpdf)
+        raw_text = extract_pdf(pdf=BytesIO(pdf_bytes),marker=taskconfig.marker)
 
         page_results = map_extract_pages(
             taskconfig=taskconfig,

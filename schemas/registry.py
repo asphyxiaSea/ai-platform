@@ -8,8 +8,8 @@ from .linke.paper import Paper
 from .linke.improved_variety import ImprovedVariety
 from .linke.standard import Standard
 from .linke.project_application import ProjectApplication
-from .taskconfig import TaskConfig
-from util import MarkerPDF
+from .taskconfig import TaskConfig,TaskMode
+from util import Marker
 
 SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     "Patent": TaskConfig(
@@ -20,6 +20,7 @@ SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     ),
     "NewVarieties": TaskConfig(
         schema=NewVarieties,
+        task_mode=TaskMode.IMAGETOTEXT,
     ),
     "SoftwareWritings": TaskConfig(
         schema=SoftwareWritings,
@@ -29,8 +30,8 @@ SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     ),
     "Paper": TaskConfig(
         schema=Paper,
-        markerpdf=MarkerPDF(
-            page_range=list(range(0, 20)),
+        marker=Marker(
+            page_range=list(range(0, 4)),
             filter_noisy=True,
         )
     ),
@@ -39,7 +40,7 @@ SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     ),
     "Standard": TaskConfig(
         schema=Standard,
-        markerpdf=MarkerPDF(
+        marker=Marker(
             filter_noisy=True,
             page_range=list(range(0, 4)),
         )
@@ -48,8 +49,5 @@ SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     "ProjectApplication": TaskConfig(
         schema=ProjectApplication,
         model="qwen3:latest",
-        markerpdf_config={
-            "page_range": list(range(0, 10)),
-        },
     ),
 }
