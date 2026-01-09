@@ -41,7 +41,6 @@ def chat_texts_images_services(
     results: List[BaseModel] = []
     for idx, image_bytes in enumerate(image_bytes_list):
         text = extract_file(file=BytesIO(image_bytes),marker=taskconfig.marker)
-        # print(text)
         results.append(_call_ollama(
             taskconfig=taskconfig,
             text=text

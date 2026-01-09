@@ -11,9 +11,9 @@ class ResearchAwards(BaseModel):
     不要输出 Schema 中未定义的字段。
     """
 
-    award_name: Optional[str] = Field(
+    achievement_name: Optional[str] = Field(
         None,
-        description="奖励名称"
+        description="成果名称或获奖项目名称"
     )
 
     award_type: Optional[str] = Field(

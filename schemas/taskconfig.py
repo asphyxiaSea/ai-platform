@@ -16,7 +16,7 @@ class TaskConfig:
     def __init__(
         self,
         schema: Type[BaseModel],
-        model: str="gemma3:latest",
+        model: str="gemma3:12b",
         vl_model:str="qwen3-vl:latest",
         # 模型保守程度，越高越不保守
         temperature: float = 0.1,

@@ -72,7 +72,7 @@ class Marker:
         page_range: list[int] | None = None,
         extract_images: bool = False,
         output_format: str = "markdown",
-        filter_noisy: bool = True,
+        filter_noisy: bool = False,
         remove_processors: list[str] | None = None,
         append_processors: list[str] | None = None,
     ):
@@ -263,7 +263,8 @@ def extract_pdf(
     resp.raise_for_status()
 
     text = resp.json()["text"]
-    return text if marker and not marker.filter_noisy else filter_noisy(text)
+    # print(text)
+    return filter_noisy(text) if marker and not marker.filter_noisy else text
 
 
 import re
