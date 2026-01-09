@@ -1,20 +1,12 @@
-from typing import Type,Any
+from typing import Type
 from pydantic import BaseModel
-from enum import Enum
-from util import Marker
-
-class TaskMode(Enum):
-    IMAGE = "image"
-    PDFTOTEXT = "pdftotext"
-    IMAGETOTEXT = "imagetotext"
-    PDFTOIMAGE = "pdftoimage"
-    PDFTOTEXTANDIAMGE = "pdftotextandimage"
-    PDFTOTEXTBYCHUNK = "pdftotextbychunk"
-    PDFTOIMAGEBYCHUNK = "pdftoimagebychunk"
+from domain.marker import Marker
+from domain.task_mode import TaskMode
 
 class TaskConfig:
     def __init__(
         self,
+        *,
         schema: Type[BaseModel],
         model: str="gemma3:12b",
         vl_model:str="qwen3-vl:latest",

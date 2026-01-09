@@ -1,7 +1,7 @@
 from typing import List,Optional, Any
 from fastapi import HTTPException
 from pydantic import BaseModel
-from schemas.taskconfig import TaskConfig
+from domain.task_config import TaskConfig
 from util.ollama import ollama_format_output
 from util.openai import openai_structure_output
 from util.pdf_utils import pdf_bytes_to_base64_images,image_bytes_to_base64

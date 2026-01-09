@@ -2,9 +2,9 @@ import re
 from io import BytesIO
 from typing import List, Dict
 from pydantic import BaseModel
-from schemas.taskconfig import TaskConfig
+from domain.task_config import TaskConfig
 from util.ollama import ollama_format_output,ollama_output
-from util.marker import extract_pdf
+from domain.marker import extract_pdf
 
 PAGE_RE = re.compile(r"^\{(\d+)\}-+$")
 

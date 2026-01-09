@@ -8,8 +8,8 @@ from .linke.paper import Paper
 from .linke.improved_variety import ImprovedVariety
 from .linke.standard import Standard
 from .linke.project_application import ProjectApplication
-from .taskconfig import TaskConfig,TaskMode
-from util import Marker
+from domain.task_config import TaskConfig,TaskMode
+from domain import Marker
 
 SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     "Patent": TaskConfig(

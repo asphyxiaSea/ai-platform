@@ -1,5 +1,5 @@
 from schemas.registry import SCHEMA_REGISTRY
-from schemas.taskconfig import TaskMode
+from domain.task_config import TaskMode
 from service.multimodal_service import chat_multimodal_images_services,chat_multimodal_pdfs_services
 from service.text_service import chat_texts_pdfs_services,chat_texts_images_services
 from service.text_chunk_service import chat_text_pdfs_service

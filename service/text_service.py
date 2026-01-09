@@ -1,9 +1,9 @@
 from typing import List
 from pydantic import BaseModel
-from schemas.taskconfig import TaskConfig
+from domain.task_config import TaskConfig
 from util.ollama import ollama_format_output
 from util.openai import openai_structure_output
-from util.marker import extract_pdf,extract_file
+from domain.marker import extract_pdf,extract_file
 from io import BytesIO
 
 def chat_texts_pdfs_services(
