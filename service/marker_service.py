@@ -3,9 +3,8 @@ from pydantic import BaseModel
 from domain.task_config import TaskConfig
 from util.ollama import ollama_format_output
 from util.openai import openai_structure_output
-from domain.marker import extract_pdf,extract_file
+from domain.marker import extract_file
 from domain.file_item import FileItem
-from io import BytesIO
 
 def marker_services(
     taskconfig: TaskConfig,
@@ -14,29 +13,15 @@ def marker_services(
 
     results: List[BaseModel] = []
 
-    for file in file_items:
+    for file_item in file_items:
         # 1. marker → text
-        text = extract_pdf(pdf=BytesIO(file.data),marker=taskconfig.marker,)
+        text = extract_file(file_item=file_item,marker=taskconfig.marker)
         # 3. text → LLM
-        result = _call_ollama(taskconfig=taskconfig, text=text,)
+        result = _call_ollama(taskconfig=taskconfig, text=text)
         results.append(result)
 
     # 当前逻辑：只取第一个（如果这是你 schema 设计决定的）
     return results[0]
-
-
-def chat_texts_pdfs_services_list(
-    taskconfig:TaskConfig,
-    pdf_bytes_list: List[bytes]
-) -> List[BaseModel]:
-    results: List[BaseModel] = []
-    for idx, pdf_bytes in enumerate(pdf_bytes_list):
-        text = extract_pdf(pdf=BytesIO(pdf_bytes),marker=taskconfig.marker)
-        results.append(_call_ollama(
-            taskconfig=taskconfig,
-            text=text
-        ))
-    return results
 
 def _call_ollama(
     taskconfig: TaskConfig,

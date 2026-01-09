@@ -1,10 +1,7 @@
 from schemas.registry import SCHEMA_REGISTRY
 from domain.task_config import TaskMode
-from service.marker_service import marker_services
 from domain import FileItem
-from service.multimodal_service import chat_multimodal_images_services,chat_multimodal_pdfs_services
-from service.text_chunk_service import chat_text_pdfs_service
-from service.multimodal_chunk_service import chat_pdfs_images_services
+from service.marker_service import marker_services
 
 
 async def chat_extract_service(

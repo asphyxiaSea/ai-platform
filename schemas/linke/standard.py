@@ -3,13 +3,13 @@ from typing import Optional,List
 
 class Standard(BaseModel):
     """
-    你是一个中文标准信息结构化抽取助手，提取 markdown 格式的文本信息。
+    你是一个中文标准信息抽取助手，提取 markdown 格式的文本信息。
     不要输出任何解释、说明、Markdown 或多余文本。
     不要输出 Schema 中未定义的字段。
     """
 
-    standard_name: Optional[str] = Field(None,description="标准的名称")
-    standard_code: Optional[str] = Field(None,description="标准号,请抽取完整,格式为：DB45/T 1257—2015")
+    standard_name: Optional[str] = Field(None,description="标准名称")
+    standard_code: Optional[str] = Field(None,description="标准号,格式为：DB45/T 1257—2015")
 
     standard_type: Optional[int] = Field(
         None,

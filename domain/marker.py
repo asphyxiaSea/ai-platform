@@ -3,6 +3,7 @@ import json
 import requests
 from typing import Any,  Union
 from pypdf import PdfReader
+from domain import FileItem
 
 DEFAULT_PROCESSORS: dict[str, str] = {
     # ===== 基础顺序 / 结构 =====
@@ -150,122 +151,43 @@ class Marker:
 
 def extract_file(
     *,
-    file: Union[str, io.BytesIO],
+    file_item: FileItem,
     marker: Marker | None = None,
 ) -> str:
-    url = "http://localhost:8004/marker/extract"
 
-    # ===== 1️⃣ 统一读取 bytes（唯一事实源）=====
-    if isinstance(file, str):
-        with open(file, "rb") as f:
-            file_bytes = f.read()
-        filename = file.split("/")[-1]
-    else:
-        file.seek(0)
-        file_bytes = file.read()
-        filename = "input"
+    is_pdf = file_item.content_type == "application/pdf"
+    is_image = file_item.content_type.startswith("image/")
 
-    # ===== 2️⃣ 判断类型（PDF / Image）=====
-    is_pdf = filename.lower().endswith(".pdf")
+    if not (is_pdf or is_image):
+        raise ValueError(f"Unsupported file type: {file_item.content_type}")
 
     data = {}
 
     if marker is not None:
         if is_pdf:
-            # 👉 PDF：读取真实页数
-            reader = PdfReader(io.BytesIO(file_bytes))
-            page_count = len(reader.pages)
+            page_count = len(PdfReader(io.BytesIO(file_item.data)).pages)
         else:
-            # 👉 Image：事实是“只有 1 页”
             page_count = 1
-
-            # 可选：强制修正 page_range
-            marker.page_range = [0]
-
-        marker.normalize_page_range(page_count)
-
-        data["config"] = json.dumps(
-            marker.to_config(),
-            ensure_ascii=False
-        )
-
-        processor_list = marker.to_processor_list()
-        if processor_list is not None:
-            data["processor_list"] = json.dumps(
-                processor_list,
-                ensure_ascii=False
-            )
-
-    # ===== 3️⃣ 上传（新的 BytesIO）=====
-    resp = requests.post(
-        url,
-        files={
-            "file": (
-                filename,
-                io.BytesIO(file_bytes),
-                "application/octet-stream",
-            )
-        },
-        data=data,
-        timeout=200,
-    )
-
-    resp.raise_for_status()
-
-    text = resp.json()["text"]
-    return text if marker and not marker.filter_noisy else filter_noisy(text)
-    
-
-
-def extract_pdf(
-    *,
-    pdf: Union[str, io.BytesIO],
-    marker: Marker | None = None,
-) -> str:
-    url = "http://localhost:8004/marker/extract"
-
-    if isinstance(pdf, str):
-        with open(pdf, "rb") as f:
-            pdf_bytes = f.read()
-        filename = pdf.split("/")[-1]
-    else:
-        pdf.seek(0)
-        pdf_bytes = pdf.read()
-        filename = "input.pdf"
-
-    data = {}
-
-    if marker is not None:
-        reader = PdfReader(io.BytesIO(pdf_bytes))
-        page_count = len(reader.pages)
 
         marker.normalize_page_range(page_count)
 
         data["config"] = json.dumps(marker.to_config(), ensure_ascii=False)
-        processor_list = marker.to_processor_list()
-        if processor_list is not None:
-            data["processor_list"] = json.dumps(processor_list, ensure_ascii=False)
 
-    # 3️⃣ 上传时也用新的 BytesIO
+        processors = marker.to_processor_list()
+        if processors:
+            data["processor_list"] = json.dumps(processors, ensure_ascii=False)
+
     resp = requests.post(
-        url,
+        "http://localhost:8004/marker/extract",
         files={
-            "file": (
-                filename,
-                io.BytesIO(pdf_bytes),
-                "application/pdf",
-            )
+            "file": (file_item.filename, file_item.data, file_item.content_type)
         },
         data=data,
-        timeout=200,
+        timeout=120,
     )
-
     resp.raise_for_status()
-
     text = resp.json()["text"]
-    # print(text)
-    return filter_noisy(text) if marker and not marker.filter_noisy else text
-
+    return text if marker and not marker.filter_noisy else filter_noisy(text)
 
 import re
 

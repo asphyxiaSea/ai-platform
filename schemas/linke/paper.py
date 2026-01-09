@@ -13,9 +13,9 @@ class Paper(BaseModel):
         description="论文题目"
     )
 
-    paper_status: Optional[str] = Field(
+    paper_status: Optional[int] = Field(
         None,
-        description="论文状态，例如：已发表、已录用、在投、预印本"
+        description="论文状态，例如：1=已录用,2=已发表"
     )
 
     doi: Optional[str] = Field(

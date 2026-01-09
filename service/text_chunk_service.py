@@ -4,55 +4,54 @@ from typing import List, Dict
 from pydantic import BaseModel
 from domain.task_config import TaskConfig
 from util.ollama import ollama_format_output,ollama_output
-from domain.marker import extract_pdf
 
 PAGE_RE = re.compile(r"^\{(\d+)\}-+$")
 
-def chat_text_pdfs_service(
-    taskconfig: TaskConfig,
-    pdf_bytes_list: list[bytes],
-) -> BaseModel:
-    """
-    多 PDF → 各自分页 → 3 页 Map → 全局 Merge → Reduce
-    """
+# def chat_text_pdfs_service(
+#     taskconfig: TaskConfig,
+#     pdf_bytes_list: list[bytes],
+# ) -> BaseModel:
+#     """
+#     多 PDF → 各自分页 → 3 页 Map → 全局 Merge → Reduce
+#     """
 
-    if not pdf_bytes_list:
-        return taskconfig.schema.model_validate({})
+#     if not pdf_bytes_list:
+#         return taskconfig.schema.model_validate({})
 
 
-    all_page_results: list[str] = []
+#     all_page_results: list[str] = []
 
-    # 2️⃣ 每个 PDF 独立 Map
-    for pdf_idx, pdf_bytes in enumerate(pdf_bytes_list, start=1):
-        raw_text = extract_pdf(pdf=BytesIO(pdf_bytes),marker=taskconfig.marker)
+#     # 2️⃣ 每个 PDF 独立 Map
+#     for pdf_idx, pdf_bytes in enumerate(pdf_bytes_list, start=1):
+#         raw_text = extract_pdf(pdf=BytesIO(pdf_bytes),marker=taskconfig.marker)
 
-        page_results = map_extract_pages(
-            taskconfig=taskconfig,
-            raw_text=raw_text,
-            pages_per_chunk=3,
-        )
+#         page_results = map_extract_pages(
+#             taskconfig=taskconfig,
+#             raw_text=raw_text,
+#             pages_per_chunk=3,
+#         )
 
-        if not page_results:
-            continue
+#         if not page_results:
+#             continue
 
-        # 给每个 PDF 加一个边界标签（非常重要）
-        for r in page_results:
-            all_page_results.append(
-                f"[PDF {pdf_idx}]\n{r}"
-            )
+#         # 给每个 PDF 加一个边界标签（非常重要）
+#         for r in page_results:
+#             all_page_results.append(
+#                 f"[PDF {pdf_idx}]\n{r}"
+#             )
 
-    if not all_page_results:
-        return taskconfig.schema.model_validate({})
+#     if not all_page_results:
+#         return taskconfig.schema.model_validate({})
 
-    # 3️⃣ 全局 Merge
-    merged_text = merge_page_results(all_page_results)
-    print(merged_text)
+#     # 3️⃣ 全局 Merge
+#     merged_text = merge_page_results(all_page_results)
+#     print(merged_text)
 
-    # 4️⃣ Reduce（一次结构化）
-    return _call_ollama(
-        taskconfig=taskconfig,
-        text=merged_text,
-    )
+#     # 4️⃣ Reduce（一次结构化）
+#     return _call_ollama(
+#         taskconfig=taskconfig,
+#         text=merged_text,
+#     )
 
 
 
