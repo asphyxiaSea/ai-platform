@@ -18,12 +18,12 @@ class ResearchAwards(BaseModel):
 
     award_type: Optional[str] = Field(
         None,
-        description="奖励类型，例如：科技进步奖、自然科学奖、技术发明奖"
+        description="奖励类型，例如：广西科学技术奖"
     )
 
     award_status: Optional[Literal[1, 2]] = Field(
         None,
-        description="奖励状态，注意获奖证书都是已获奖：1=申报，2=获奖"
+        description="奖励状态，出现证书等字符都是已获奖：1=申报，2=获奖"
     )
 
     award_level: Literal["国家级", "省部级", "部级"]= Field(

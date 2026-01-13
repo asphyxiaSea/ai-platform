@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional,List
+from typing import Optional,List, Literal
 
 class NewVarieties(BaseModel):
     """
@@ -16,12 +16,13 @@ class NewVarieties(BaseModel):
         None,
         description="所属的种和属"
     )
-
+    variety_type: Literal[1, 2] = Field(
+        description="品种类型,一般英文都是国际登录新品种,1=新品种、2=国际登录新品种"
+    )
     variety_right_number: Optional[str] = Field(
         None,
         description="品种权号（植物新品种权号）"
     )
-
     variety_status: Optional[int] = Field(
         None,
         description=(
@@ -30,22 +31,18 @@ class NewVarieties(BaseModel):
             "1=申请，2=授权，3=转让"
         )
     )
-
     application_date: Optional[str] = Field(
         None,
         description="申请日期,输出格式如：2022-03-15、2022-03"
     )
-
     grant_date: Optional[str] = Field(
         None,
         description="授权日期,输出格式如：2022-03-15、2022-03"
     )
-
     variety_right_holder: Optional[str] = Field(
         None,
         description="品种权人（单位或个人）"
     )
-
     breeders: Optional[List[str]] = Field(
         default_factory=list,
         description="选育人列表，按原文顺序提取"
