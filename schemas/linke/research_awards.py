@@ -26,7 +26,7 @@ class ResearchAwards(BaseModel):
         description="奖励状态，出现证书等字符都是已获奖：1=申报，2=获奖"
     )
 
-    award_level: Literal["国家级", "省部级", "部级"]= Field(
+    award_level: Literal["国家级", "省部奖", "部级"]= Field(
         description="奖励级别，指奖项所属层级，注意有文中有国家这两个字的一般为国家级，例如：国家级、省部级等"
     )
 
