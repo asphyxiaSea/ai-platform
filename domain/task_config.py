@@ -13,7 +13,7 @@ class TaskConfig:
         # 模型保守程度，越高越不保守
         temperature: float = 0.1,
         max_tokens: int = 2048,
-        task_mode: TaskMode = TaskMode.FILESTOTEXTBYMARKER,
+        task_mode: TaskMode = TaskMode.FILESTOTEXTBYPADDLE,
         # 修改marker-pdf配置
         marker: Marker | None = None,
     ):
