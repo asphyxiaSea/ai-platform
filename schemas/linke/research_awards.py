@@ -13,7 +13,7 @@ class ResearchAwards(BaseModel):
 
     achievement_name: Optional[str] = Field(
         None,
-        description="成果名称或获奖项目名称"
+        description="成果名称或项目名称"
     )
 
     award_type: Optional[str] = Field(
@@ -37,10 +37,10 @@ class ResearchAwards(BaseModel):
 
     awardees: Optional[List[str]] = Field(
         default_factory=list,
-        description="获奖者列表，包含所有参与该奖项申报或获得该奖项的人员姓名"
+        description="获奖者列表，重复出现获奖者说明有多个，需要提取所有获得该奖项的人员姓名。"
     )
 
     application_date: Optional[str] = Field(
         None,
-        description="申报或获奖时间，不是证书号"
+        description="申报或获奖时间，不是证书号。输出格式为2023-01-01"
     )

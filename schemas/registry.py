@@ -29,6 +29,7 @@ SCHEMA_REGISTRY: Dict[str, TaskConfig] = {
     ),
     "Paper": TaskConfig(
         schema=Paper,
+        task_mode=TaskMode.FILESTOTEXTBYMARKER,
         marker=Marker(
             page_range=list(range(0, 4)),
             filter_noisy=True,

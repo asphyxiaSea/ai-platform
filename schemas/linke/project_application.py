@@ -45,7 +45,7 @@ class ProjectApplication(BaseModel):
 
     project_duration: Optional[List[str]] = Field(
         None,
-        description="项目起止时间，通常在第一页，格式示例：[2023-01, 2025-12]"
+        description="项目起止时间，通常在第一页，格式示例：[2023-01-01, 2025-12-01]"
     )
 
     approval_numbers: List[str] = Field(

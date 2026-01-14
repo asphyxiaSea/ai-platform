@@ -14,6 +14,11 @@ class Patent(BaseModel):
         description="专利号"
     )
 
+    application_number: Optional[str] = Field(
+        None,
+        description="申请号"
+    )
+
     patent_type: Optional[Literal[1, 2, 3, 4]] = Field(
         None,
         description="专利类型：1=PCT, 2=发明, 3=实用新型, 4=外观"
