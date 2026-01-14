@@ -27,7 +27,7 @@ class ResearchAwards(BaseModel):
     )
 
     award_level: Literal["国家级", "省部奖", "部级"]= Field(
-        description="奖励级别，指奖项所属层级，注意有文中有国家这两个字的一般为国家级，例如：国家级、省部级等"
+        description="奖励级别，指奖项所属层级，只有字段对应值包含国家或中华人民共和国的为国家级"
     )
 
     award_grade: Optional[Literal["特等奖", "一等奖", "二等奖", "三等奖","金奖","银奖","优秀奖"]] = Field(
@@ -42,5 +42,5 @@ class ResearchAwards(BaseModel):
 
     application_date: Optional[str] = Field(
         None,
-        description="申报或获奖时间，格式如：2020-05"
+        description="申报或获奖时间，不是证书号"
     )

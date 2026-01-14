@@ -15,16 +15,16 @@ class Standard(BaseModel):
         None,
         description=(
         "标准的类型,"
-        "取值范围："
-        "1=国家标准,2=行业标准,3=地方标准,4=团体标准"
+        "在文档中找到对应的值，返回数字："
+        "国家标准=1,行业标准=2,地方标准=3,团体标准=4"
         )
     )    
     standard_status: Optional[int] = Field(
         None,
         description=(
         "标准状态代码。"
-        "取值范围："
-        "1=发布,2=现行,3=废止"
+        "在文档中找到对应的值，返回数字："
+        "发布=1,现行=2,废止=3"
         )
     )
     publish_date: Optional[str] = Field(None,description="发布时间,例如:2023年6月输出2023-06")
