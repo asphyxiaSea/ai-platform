@@ -23,11 +23,13 @@ class Standard(BaseModel):
         None,
         description=(
         "标准状态代码。"
-        "在文档中找到对应的值，返回数字："
-        "发布实施=1,现行=2,废止=3"
+        "在文档中出现相应值，返回数字："
+        "出现发布或者实施都是=1,现行=2,废止=3"
         )
     )
     publish_date: Optional[str] = Field(None,description="发布时间,输出格式：2023-06-01")
     implement_date: Optional[str] = Field(None,description="实施时间,输出格式：2023-06-01")
     drafting_organizations: Optional[List[str]] = Field(default_factory=list,description="起草单位")
     drafters: Optional[List[str]] = Field(default_factory=list,description="起草人")
+
+

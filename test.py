@@ -1,8 +1,8 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "paddleocr API",
-    "description": "调用paddleocr模型",
+    "title": "ai-platform",
+    "description": "ai-platform",
     "version": "1.0.0"
   },
   "servers": [
@@ -11,9 +11,9 @@
     }
   ],
   "paths": {
-    "/paddleocr/predict": {
+    "/ai-platform/files/parse": {
       "post": {
-        "operationId": "paddleocr",
+        "operationId": "FilesParse",
         "summary": "输入图像或PDF调用模型推理，输出结构化信息。",
         "requestBody": {
           "required": true,
@@ -21,12 +21,20 @@
             "multipart/form-data": {
               "schema": {
                 "type": "object",
-                "required": ["files"],
+                "required": ["schema","files"],
                 "properties": {
-                   "file": {
-                    "type": "string",
-                    "format": "binary",
-                    "description": "PDF 或图片文件（一次仅支持一个文件）"
+                  "system_prompt": {
+                    "type": "string"
+                  },
+                  "schema": {
+                    "type": "string"
+                  },
+                "files": {
+                    "type": "array",
+                    "items":{
+                       "type": "string",
+                       "format": "binary"
+                     }
                   }
                 }
               }

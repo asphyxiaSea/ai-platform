@@ -41,3 +41,5 @@ class SoftwareWritings(BaseModel):
         default_factory=list,
         description="著作权人列表,按原文正常阅读顺序提取"
     )
+
+

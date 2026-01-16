@@ -10,7 +10,7 @@ class Paper(BaseModel):
 
     title: Optional[str] = Field(
         None,
-        description="论文题目"
+        description="论文题目,优先使用中文题目。"
     )
 
     paper_status: Literal[1, 2] = Field(
@@ -27,7 +27,7 @@ class Paper(BaseModel):
 
     journal_name: Optional[str] = Field(
         None,
-        description="期刊名称"
+        description="期刊名称，优先使用中文期刊名称"
     )
 
     publish_year: Optional[str] = Field(
@@ -52,3 +52,4 @@ class Paper(BaseModel):
         default_factory=list,
         description="作者列表，按论文署名顺序提取"
     )
+

@@ -1,6 +1,6 @@
 from typing import List
 from pydantic import BaseModel
-from domain.task_config import TaskConfig
+from domain.task_config_factory import TaskConfig
 from util.ollama import ollama_format_output
 from util.openai import openai_structure_output
 from domain.marker import extract_file

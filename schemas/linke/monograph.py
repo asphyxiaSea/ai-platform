@@ -51,3 +51,5 @@ class MonoGraph(BaseModel):
         None,
         description="编委（编委会成员）"
     )
+
+
