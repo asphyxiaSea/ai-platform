@@ -14,7 +14,7 @@ def extract_file(
 
 
     resp = requests.post(
-        "http://localhost:8005/paddleocr/predict",
+        "http://localhost:8003/paddle/pp-structurev3/predict",
         files={
             "file": (file_item.filename, file_item.data, file_item.content_type)
         },
