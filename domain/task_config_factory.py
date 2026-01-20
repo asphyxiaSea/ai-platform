@@ -2,7 +2,7 @@ from typing import Type
 from pydantic import BaseModel
 from domain.marker import Marker
 
-from typing import Type
+from typing import Type,Any
 from pydantic import BaseModel
 from enum import Enum
 
@@ -31,6 +31,8 @@ class TaskConfig:
         task_mode: TaskMode = TaskMode.FILESTOTEXTBYPADDLE,
         # 修改marker-pdf配置
         marker: Marker | None = None,
+        # 输入文件前处理
+        preprocess: dict[str,Any] | None = None,
     ):
         self.schema = schema
         self.model = model
@@ -40,6 +42,7 @@ class TaskConfig:
         self.system_prompt = system_prompt
         self.task_mode = task_mode
         self.marker = marker
+        self.preprocess = preprocess
 
 def TaskConfig_factory(
     *,
@@ -49,6 +52,7 @@ def TaskConfig_factory(
     vl_model: str = "qwen3-vl:latest",
     temperature: float = 0.1,
     max_tokens: int = 2048,
+    preprocess: dict[str,Any] | None = None,
 ) -> TaskConfig:
     """
     构建 TaskConfig
@@ -61,5 +65,6 @@ def TaskConfig_factory(
         temperature=temperature,
         max_tokens=max_tokens,
         task_mode=task_mode,
+        preprocess=preprocess,
     )
 

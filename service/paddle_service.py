@@ -4,6 +4,7 @@ from domain.task_config_factory import TaskConfig
 from domain.file_item import FileItem
 from domain.paddle import extract_file
 from util.ollama import ollama_format_output
+import re
 
 def paddle_services(
     taskconfig: TaskConfig,
@@ -13,14 +14,40 @@ def paddle_services(
     for file_item in file_items:
         # 1. marker → text
         text = extract_file(file_item=file_item)
-        print(text)
+        text = _clean_markdown(text)
         # 3. text → LLM
         result = _call_ollama(taskconfig=taskconfig, text=text)
         results.append(result)
 
-    # 当前逻辑：只取第一个（如果这是你 schema 设计决定的）
-
     return results[0]
+    
+def _clean_markdown(text: str) -> str:
+    """
+    移除 <img> / <div> / HTML 标签
+    """
+    text = re.sub(r"<img[^>]*?>", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"</?div[^>]*?>", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"<[^>]+>", "", text)
+    text = re.sub(r"\n{2,}", "\n", text)
+    
+    return text
+
+
+def paddle_services_list(
+    taskconfig: TaskConfig,
+    file_items: list[FileItem],
+) -> dict[str, List[BaseModel]]:
+    results: List[BaseModel] = []
+    for file_item in file_items:
+        # 1. marker → text
+        text = extract_file(file_item=file_item)
+        # 3. text → LLM
+        result = _call_ollama(taskconfig=taskconfig, text=text)
+        results.append(result)
+
+    return {
+        "results": results  # 这里定义的键名要与输出变量名一致
+    }
 
 
 def _call_ollama(

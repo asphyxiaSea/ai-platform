@@ -1,6 +1,15 @@
 import requests
 from domain.file_item import FileItem
 
+# class Paddle:
+#     def __init__(
+#         self, 
+#         use_table_recognition: bool = False,
+#         markdown_ignore_labels: list[str] | None = None,
+
+#     ):
+
+
 def extract_file(
     *,
     file_item: FileItem,
@@ -23,3 +32,5 @@ def extract_file(
     resp.raise_for_status()
     text = resp.json()["markdown_text"]
     return text
+
+
