@@ -3,9 +3,9 @@ from pydantic import BaseModel, Field
 
 class Paper(BaseModel):
     """
-    你是一个中文论文信息结构化抽取助手，提取markdown格式的文本信息。
-    不要输出任何解释、说明、Markdown 或多余文本。
-    不要输出 Schema 中未定义的字段。
+你是一个中文论文信息结构化抽取助手，提取markdown格式的文本信息。
+不要输出任何解释、说明、Markdown 或多余文本。
+不要输出 Schema 中未定义的字段。
     """
 
     title: Optional[str] = Field(

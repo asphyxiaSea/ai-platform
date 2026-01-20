@@ -4,8 +4,8 @@ from pydantic import BaseModel, Field
 
 class ProjectApplication(BaseModel):
     """
-    你是一个中文项目申报信息结构化抽取助手,根据html格式的文本信息,提取字段信息。
-    只返回符合 Schema 的 JSON，不要输出任何解释、说明或多余文本。
+你是一个中文项目申报信息结构化抽取助手,根据markdown格式的文本信息,提取字段信息。
+只返回符合 Schema 的 JSON，不要输出任何解释、说明或多余文本。
     """
 
     project_name: Optional[str] = Field(

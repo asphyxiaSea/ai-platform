@@ -2,7 +2,7 @@ from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from typing import List,Optional
 from service.extract_service import extract_service
 from domain import FileItem
-from domain.build_schema import build_pydantic_schema
+from domain.build_schema import get_schema_model
 from domain.task_config_factory import TaskConfig_factory
 from pydantic import BaseModel
 from domain.preprocess import pdf_preprocess
@@ -39,11 +39,18 @@ async def parse(
     except Exception as e:
         raise HTTPException(400, f"Invalid schema payload: {e}")
 
-    #  自动装配 Schema
-    schema_model = build_pydantic_schema(
-        schema_name=schema_payload.schema_name,
-        fields=schema_payload.fields,
-    )
+    try:
+        # 自动装配 Schema
+        schema_model = get_schema_model(
+            schema_name=schema_payload.schema_name,
+            fields=schema_payload.fields,
+        )
+    except Exception as e:
+        # 捕获 get_schema_model 内部可能抛出的所有错误
+        raise HTTPException(
+            status_code=400,
+            detail=f"Schema的格式不正确，检查字段类型及格式: {e}"
+        )
     # 前处理
     try:
         preprocess_dict = json.loads(preprocess) if preprocess else None
@@ -52,7 +59,7 @@ async def parse(
 
 
    #  自动装配 taskconfig 
-    taskconfig = TaskConfig_factory(schema=schema_model,preprocess=preprocess_dict)
+    taskconfig = TaskConfig_factory(schema=schema_model,preprocess=preprocess_dict,system_prompt=system_prompt)
 
     # 文件读取
     file_items: list[FileItem] = []
