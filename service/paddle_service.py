@@ -12,7 +12,7 @@ def paddle_services(
 ) -> BaseModel:
     results: List[BaseModel] = []
     for file_item in file_items:
-        # 1. marker → text
+        # 1. paddle → text
         text = extract_file(file_item=file_item)
         text = _clean_markdown(text)
         # 3. text → LLM
@@ -24,12 +24,21 @@ def paddle_services(
 def _clean_markdown(text: str) -> str:
     """
     移除 <img> / <div> / HTML 标签
+    并删除中文字符之间的空格
     """
     text = re.sub(r"<img[^>]*?>", "", text, flags=re.IGNORECASE)
     text = re.sub(r"</?div[^>]*?>", "", text, flags=re.IGNORECASE)
     text = re.sub(r"<[^>]+>", "", text)
+
+    # ✅ 删除中文字符之间的空格
+    text = re.sub(
+        r"(?<=[\u4e00-\u9fff])\s+(?=[\u4e00-\u9fff])",
+        "",
+        text
+    )
+
     text = re.sub(r"\n{2,}", "\n", text)
-    
+
     return text
 
 
@@ -75,7 +84,6 @@ def _call_ollama(
 """.strip()
 
     user_prompt = f"""
-【文档内容】
 {text}
 """.strip()
 
