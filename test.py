@@ -29,6 +29,12 @@
                   "schema": {
                     "type": "string"
                   },
+                  "preprocess": {
+                    "type": "string"
+                  },
+                  "postprocess": {
+                    "type": "string"
+                  },
                 "files": {
                     "type": "array",
                     "items":{

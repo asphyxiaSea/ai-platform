@@ -14,6 +14,7 @@ class SchemaPayload(BaseModel):
     schema_name: str
     fields: list[dict]
 
+# 防止schema错误空格
 def clean_text(s: str) -> str:
     return (
         s.replace("\u00a0", " ")
@@ -24,7 +25,8 @@ def clean_text(s: str) -> str:
 @router.post("/parse")
 async def parse(
     system_prompt: Optional[str] = Form(None), 
-    preprocess: Optional[str] = Form(None),  
+    preprocess: Optional[str] = Form(None), 
+    postprocess: Optional[str] = Form(None), 
     schema: str = Form(...),
     files: List[UploadFile] = File(...),
 ):
@@ -54,12 +56,14 @@ async def parse(
     # 前处理
     try:
         preprocess_dict = json.loads(preprocess) if preprocess else None
+        postprocess_dict = json.loads(postprocess) if postprocess else None
     except json.JSONDecodeError as e:
-        raise HTTPException(400, f"Invalid preprocess JSON: {e}")
+        raise HTTPException(400, f"Invalid preprocess or postprocess JSON: {e}")
 
 
-   #  自动装配 taskconfig 
-    taskconfig = TaskConfig_factory(schema=schema_model,preprocess=preprocess_dict,system_prompt=system_prompt)
+   #  自动装配 taskconfig
+    taskconfig = TaskConfig_factory(schema=schema_model,preprocess=preprocess_dict,
+                                    postprocess=postprocess_dict,system_prompt=system_prompt)
 
     # 文件读取
     file_items: list[FileItem] = []

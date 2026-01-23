@@ -4,6 +4,7 @@ from domain.task_config_factory import TaskConfig
 from domain.file_item import FileItem
 from domain.paddle import extract_file
 from util.ollama import ollama_format_output
+from domain.postprocess import text_postprocess
 import re
 
 def paddle_services(
@@ -14,32 +15,17 @@ def paddle_services(
     for file_item in file_items:
         # 1. paddle → text
         text = extract_file(file_item=file_item)
-        text = _clean_markdown(text)
+        final_text = text_postprocess(
+            text,
+            target_sections=taskconfig.postprocess.get("target_sections",[]) 
+            if taskconfig.postprocess else None
+        )
+        
         # 3. text → LLM
-        result = _call_ollama(taskconfig=taskconfig, text=text)
+        result = _call_ollama(taskconfig=taskconfig, text=final_text)
         results.append(result)
 
     return results[0]
-    
-def _clean_markdown(text: str) -> str:
-    """
-    移除 <img> / <div> / HTML 标签
-    并删除中文字符之间的空格
-    """
-    text = re.sub(r"<img[^>]*?>", "", text, flags=re.IGNORECASE)
-    text = re.sub(r"</?div[^>]*?>", "", text, flags=re.IGNORECASE)
-    text = re.sub(r"<[^>]+>", "", text)
-
-    # ✅ 删除中文字符之间的空格
-    text = re.sub(
-        r"(?<=[\u4e00-\u9fff])\s+(?=[\u4e00-\u9fff])",
-        "",
-        text
-    )
-
-    text = re.sub(r"\n{2,}", "\n", text)
-
-    return text
 
 
 def paddle_services_list(

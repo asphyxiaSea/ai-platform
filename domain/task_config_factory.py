@@ -34,7 +34,10 @@ class TaskConfig:
     # pipeline
     task_mode: TaskMode = TaskMode.FILESTOTEXTBYPADDLE
     marker: Marker | None = None
+
+    # process
     preprocess: dict[str, Any] | None = None
+    postprocess: dict[str, Any] | None = None
 
 
 def TaskConfig_factory(
