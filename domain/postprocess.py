@@ -11,7 +11,7 @@ TITLE_RE = re.compile(
 def text_filter(text: str) -> str:
     text = re.sub(r"<img[^>]*?>", "", text, flags=re.IGNORECASE)
     text = re.sub(r"</?div[^>]*?>", "", text, flags=re.IGNORECASE)
-    # text = re.sub(r"<[^>]+>", " ", text)  # 兜底移除其他 HTML
+    text = re.sub(r"<[^>]+>", "", text)  # 兜底移除其他 HTML
     text = re.sub(r"\n{2,}", "\n", text)
     return text.strip()
 
