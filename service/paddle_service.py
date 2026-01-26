@@ -5,30 +5,8 @@ from domain.file_item import FileItem
 from domain.paddle import extract_file
 from util.ollama import ollama_format_output
 from domain.postprocess import text_postprocess
-import re
 
 def paddle_services(
-    taskconfig: TaskConfig,
-    file_items: list[FileItem],
-) -> BaseModel:
-    results: List[BaseModel] = []
-    for file_item in file_items:
-        # 1. paddle → text
-        text = extract_file(file_item=file_item)
-        final_text = text_postprocess(
-            text,
-            target_sections=taskconfig.postprocess.get("target_sections",[]) 
-            if taskconfig.postprocess else None
-        )
-        
-        # 3. text → LLM
-        result = _call_ollama(taskconfig=taskconfig, text=final_text)
-        results.append(result)
-
-    return results[0]
-
-
-def paddle_services_list(
     taskconfig: TaskConfig,
     file_items: list[FileItem],
 ) -> dict[str, List[BaseModel]]:
@@ -36,8 +14,13 @@ def paddle_services_list(
     for file_item in file_items:
         # 1. marker → text
         text = extract_file(file_item=file_item)
+        final_text = text_postprocess(
+            text,
+            target_sections=taskconfig.postprocess.get("target_sections",[]) 
+            if taskconfig.postprocess else None
+        )
         # 3. text → LLM
-        result = _call_ollama(taskconfig=taskconfig, text=text)
+        result = _call_ollama(taskconfig=taskconfig, text=final_text)
         results.append(result)
 
     return {

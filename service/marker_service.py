@@ -9,7 +9,7 @@ from domain.file_item import FileItem
 def marker_services(
     taskconfig: TaskConfig,
     file_items: list[FileItem],
-) -> BaseModel:
+) -> dict[str, List[BaseModel]]:
 
     results: List[BaseModel] = []
 
@@ -22,7 +22,9 @@ def marker_services(
 
     # 当前逻辑：只取第一个（如果这是你 schema 设计决定的）
     
-    return results[0]
+    return {
+        "results": results  # 这里定义的键名要与输出变量名一致
+    }
 
 def _call_ollama(
     taskconfig: TaskConfig,
