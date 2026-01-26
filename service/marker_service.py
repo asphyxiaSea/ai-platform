@@ -5,8 +5,9 @@ from util.ollama import ollama_format_output
 from util.openai import openai_structure_output
 from domain.marker import extract_file
 from domain.file_item import FileItem
+from fastapi.concurrency import run_in_threadpool
 
-def marker_services(
+async def marker_services(
     taskconfig: TaskConfig,
     file_items: list[FileItem],
 ) -> dict[str, List[BaseModel]]:
@@ -14,19 +15,21 @@ def marker_services(
     results: List[BaseModel] = []
 
     for file_item in file_items:
-        # 1. marker → text
-        text = extract_file(file_item=file_item,marker=taskconfig.marker)
+        # 1. marker → text (blocking) -> run in threadpool
+        text = await run_in_threadpool(
+            extract_file, file_item=file_item, marker=taskconfig.marker
+        )
+
         # 3. text → LLM
-        result = _call_ollama(taskconfig=taskconfig, text=text)
+        result = await _call_ollama(taskconfig=taskconfig, text=text)
         results.append(result)
 
     # 当前逻辑：只取第一个（如果这是你 schema 设计决定的）
-    
     return {
         "results": results  # 这里定义的键名要与输出变量名一致
     }
 
-def _call_ollama(
+async def _call_ollama(
     taskconfig: TaskConfig,
     text: str
 ) -> BaseModel:
@@ -60,7 +63,7 @@ def _call_ollama(
         {"role": "user", "content": user_prompt},
     ]
 
-    return ollama_format_output(
+    return await ollama_format_output(
         model=taskconfig.model,
         schema=taskconfig.schema,
         messages=messages,

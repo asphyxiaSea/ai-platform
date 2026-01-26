@@ -5,22 +5,24 @@ from domain.file_item import FileItem
 from domain.paddle import extract_file
 from util.ollama import ollama_format_output
 from domain.postprocess import text_postprocess
+from fastapi.concurrency import run_in_threadpool
 
-def paddle_services(
+async def paddle_services(
     taskconfig: TaskConfig,
     file_items: list[FileItem],
 ) -> dict[str, List[BaseModel]]:
     results: List[BaseModel] = []
     for file_item in file_items:
-        # 1. marker → text
-        text = extract_file(file_item=file_item)
+        # 1. paddle → text (blocking) -> run in threadpool
+        text = await run_in_threadpool(extract_file, file_item=file_item)
         final_text = text_postprocess(
             text,
-            target_sections=taskconfig.postprocess.get("target_sections",[]) 
+            target_sections=taskconfig.postprocess.get("target_sections",[])
             if taskconfig.postprocess else None
         )
+        
         # 3. text → LLM
-        result = _call_ollama(taskconfig=taskconfig, text=final_text)
+        result = await _call_ollama(taskconfig=taskconfig, text=final_text)
         results.append(result)
 
     return {
@@ -28,7 +30,7 @@ def paddle_services(
     }
 
 
-def _call_ollama(
+async def _call_ollama(
     taskconfig: TaskConfig,
     text: str
 ) -> BaseModel:
@@ -61,7 +63,7 @@ def _call_ollama(
         {"role": "user", "content": user_prompt},
     ]
 
-    return ollama_format_output(
+    return await ollama_format_output(
         model=taskconfig.model,
         schema=taskconfig.schema,
         messages=messages,

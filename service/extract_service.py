@@ -13,7 +13,7 @@ async def extract_service(
     if taskconfig.task_mode == TaskMode.FILESTOTEXTBYMARKER:
         if not file_items:
             raise ValueError("This schema requires files input")
-        return marker_services(
+        return await marker_services(
             taskconfig=taskconfig,
             file_items=file_items,
         )
@@ -21,7 +21,7 @@ async def extract_service(
     if taskconfig.task_mode == TaskMode.FILESTOTEXTBYPADDLE:
         if not file_items:
             raise ValueError("This schema requires files input")
-        return paddle_services(
+        return await paddle_services(
             taskconfig=taskconfig,
             file_items=file_items,
         )

@@ -1,8 +1,9 @@
 from pydantic import BaseModel
 from fastapi import HTTPException
-import requests
+import httpx
 
-def ollama_format_output(
+
+async def ollama_format_output(
     *,
     model: str,
     schema: type[BaseModel],
@@ -20,13 +21,10 @@ def ollama_format_output(
     }
 
     try:
-        resp = requests.post(
-            "http://localhost:8001/api/chat",
-            json=payload,
-            timeout=100,
-        )
-        resp.raise_for_status() 
-    except requests.RequestException:
+        async with httpx.AsyncClient(timeout=100.0) as client:
+            resp = await client.post("http://localhost:8001/api/chat", json=payload)
+            resp.raise_for_status()
+    except (httpx.RequestError, httpx.HTTPStatusError):
         raise HTTPException(502, "推理超时或 Ollama 服务异常")
 
     data = resp.json()
@@ -39,7 +37,7 @@ def ollama_format_output(
     return schema.model_validate_json(content)
 
 
-def ollama_output(
+async def ollama_output(
     *,
     model: str,
     messages: list[dict],
@@ -54,12 +52,10 @@ def ollama_output(
     }
 
     try:
-        resp = requests.post(
-            "http://localhost:8001/api/chat",
-            json=payload,
-            timeout=200,
-        )
-        resp.raise_for_status() 
-    except requests.RequestException:
+        async with httpx.AsyncClient(timeout=200.0) as client:
+            resp = await client.post("http://localhost:8001/api/chat", json=payload)
+            resp.raise_for_status()
+    except (httpx.RequestError, httpx.HTTPStatusError):
         raise HTTPException(502, "推理超时或 Ollama 服务异常")
+
     return resp.json()["message"]["content"]
