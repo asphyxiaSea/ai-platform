@@ -3,18 +3,16 @@ from pydantic import BaseModel
 from domain.task_config_factory import TaskConfig
 from domain.file_item import FileItem
 from domain.paddle import extract_file
-from util.ollama import ollama_format_output
+from util.llm_client import structured_output
 from domain.postprocess import text_postprocess
-from fastapi.concurrency import run_in_threadpool
-
 async def paddle_services(
     taskconfig: TaskConfig,
     file_items: list[FileItem],
-) -> dict[str, List[BaseModel]]:
-    results: List[BaseModel] = []
+) -> dict[str, list[BaseModel]]:
+    results: list[BaseModel] = []
     for file_item in file_items:
-        # 1. paddle → text (blocking) -> run in threadpool
-        text = await run_in_threadpool(extract_file, file_item=file_item)
+        # 1. paddle → text
+        text = await extract_file(file_item=file_item)
         final_text = text_postprocess(
             text,
             target_sections=taskconfig.postprocess.get("target_sections",[])
@@ -63,7 +61,7 @@ async def _call_ollama(
         {"role": "user", "content": user_prompt},
     ]
 
-    return await ollama_format_output(
+    return await structured_output(
         model=taskconfig.model,
         schema=taskconfig.schema,
         messages=messages,

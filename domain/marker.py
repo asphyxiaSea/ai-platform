@@ -1,8 +1,7 @@
 import io
 import json
-import requests
+import httpx
 from typing import Any,  Union
-from pypdf import PdfReader
 from domain import FileItem
 
 DEFAULT_PROCESSORS: dict[str, str] = {
@@ -149,7 +148,7 @@ class Marker:
         return processor_list
     
 
-def extract_file(
+async def extract_file(
     *,
     file_item: FileItem,
     marker: Marker | None = None,
@@ -163,30 +162,26 @@ def extract_file(
 
     data = {}
 
+    # PDF 页面拆分已在路由层的 preprocess 完成，Marker 仅需传递 config 和 processor_list
     if marker is not None:
-        if is_pdf:
-            page_count = len(PdfReader(io.BytesIO(file_item.data)).pages)
-        else:
-            page_count = 1
-
-        marker.normalize_page_range(page_count)
-
         data["config"] = json.dumps(marker.to_config(), ensure_ascii=False)
 
         processors = marker.to_processor_list()
         if processors:
             data["processor_list"] = json.dumps(processors, ensure_ascii=False)
 
-    resp = requests.post(
-        "http://localhost:8004/marker/extract",
-        files={
-            "file": (file_item.filename, file_item.data, file_item.content_type)
-        },
-        data=data,
-        timeout=120,
-    )
-    resp.raise_for_status()
-    text = resp.json()["text"]
+    async with httpx.AsyncClient(timeout=120.0) as client:
+        resp = await client.post(
+            "http://localhost:8004/marker/extract",
+            files={
+                "file": (file_item.filename, file_item.data, file_item.content_type)
+            },
+            data=data,
+        )
+        resp.raise_for_status()
+        json_data = resp.json()
+
+    text = json_data.get("text", "")
     return text if marker and not marker.filter_noisy else filter_noisy(text)
 
 import re

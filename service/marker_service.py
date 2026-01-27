@@ -1,11 +1,9 @@
 from typing import List
 from pydantic import BaseModel
 from domain.task_config_factory import TaskConfig
-from util.ollama import ollama_format_output
-from util.openai import openai_structure_output
+from util.llm_client import structured_output
 from domain.marker import extract_file
 from domain.file_item import FileItem
-from fastapi.concurrency import run_in_threadpool
 
 async def marker_services(
     taskconfig: TaskConfig,
@@ -15,10 +13,8 @@ async def marker_services(
     results: List[BaseModel] = []
 
     for file_item in file_items:
-        # 1. marker → text (blocking) -> run in threadpool
-        text = await run_in_threadpool(
-            extract_file, file_item=file_item, marker=taskconfig.marker
-        )
+        # 1. marker → text
+        text = await extract_file(file_item=file_item, marker=taskconfig.marker)
 
         # 3. text → LLM
         result = await _call_ollama(taskconfig=taskconfig, text=text)
@@ -63,7 +59,7 @@ async def _call_ollama(
         {"role": "user", "content": user_prompt},
     ]
 
-    return await ollama_format_output(
+    return await structured_output(
         model=taskconfig.model,
         schema=taskconfig.schema,
         messages=messages,
@@ -71,7 +67,7 @@ async def _call_ollama(
     )
 
 
-def _call_openai(
+async def _call_openai(
     taskconfig: TaskConfig,
     text: str
 ) -> BaseModel:
@@ -87,9 +83,10 @@ def _call_openai(
         },
     ]
 
-    return openai_structure_output(
+    return await structured_output(
         model=taskconfig.model,
         schema=taskconfig.schema,
         messages=messages,
         temperature=taskconfig.temperature,
+        backend="openai",
     )
