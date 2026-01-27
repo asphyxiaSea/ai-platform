@@ -61,6 +61,38 @@ curl -X POST "http://localhost:8000/ai-platform/files/parse" \
 - PDF 与 OCR：PDF 的前处理逻辑集中在 [domain/preprocess.py](domain/preprocess.py)（路由层触发）；有关 paddle 的抽取在 [domain/paddle.py](domain/paddle.py)。修改前务必检查 `preprocess` / `postprocess` 的 JSON 结构。
 - 返回模型：服务层函数通常返回 `pydantic.BaseModel` 实例或列表。自动化测试或代码生成时，遵循现有返回值（不要随意把返回改为原始 dict，除非同步更新调用方）。
 
+## 同步 / 异步 约定（重要）
+
+本项目对同步与异步有明确约定，修改或新增代码时请严格遵守：
+
+- **网络与外部服务（异步）**: 所有对外 HTTP / RPC 调用必须使用异步客户端（`httpx.AsyncClient`），并以 `async def` 暴露。示例文件：[util/ollama.py](util/ollama.py)、[domain/paddle.py](domain/paddle.py)、[domain/marker.py](domain/marker.py)。
+- **LLM 调用（异步）**: 同步 SDK 请包成异步封装（`asyncio.to_thread`）或直接使用异步 HTTP。统一入口为 [util/llm_client.py](util/llm_client.py)，使用 `await structured_output(...)`。示例：`util/ollama.py`, `util/openai.py`。
+- **文件上传/下载 与 FastAPI 接口（异步）**: 路由层使用 `UploadFile.read()`、返回流等均为异步，路由函数应为 `async def`。示例：[router/files_extract.py](router/files_extract.py)。
+- **PDF 页数解析（线程池）**: `pypdf.PdfReader` 等 CPU / blocking 操作应放入线程池（`asyncio.to_thread`）。已实现例子：[domain/marker.py](domain/marker.py)。
+- **域模型 / 业务算法 / 文本处理（同步）**: 领域模型与纯 CPU 算法（如文本后处理、processor 列表构造）保持同步实现，调用方在需要将阻塞操作放在线程或在异步函数中 `await` 对应的 async wrapper。示例目录：[domain/](domain/)。
+- **服务层（异步）**: service 层负责 orchestration，应采用 `async def` 并 `await` 下游异步调用（例：[service/extract_service.py](service/extract_service.py)，[service/marker_service.py](service/marker_service.py)，[service/paddle_service.py](service/paddle_service.py)）。
+
+举例：
+
+ - 异步服务函数示例：
+
+```python
+async def paddle_services(...):
+  text = await domain.paddle.extract_file(file_item=fi)
+  result = await llm_client.structured_output(...)
+```
+
+ - 同步域函数示例（保留同步实现）：
+
+```python
+class Marker:
+  def to_processor_list(self) -> list[str]:
+    # 同步逻辑
+    ...
+```
+
+约定小结：网络/IO/LLM/Upload 都 async；域模型/算法保持 sync；阻塞库（PDF/CPU heavy）走线程池。
+
 ## 参考文件（快速跳转）
 - 应用入口：[main.py](main.py)
 - 路由：[router/files_extract.py](router/files_extract.py)
