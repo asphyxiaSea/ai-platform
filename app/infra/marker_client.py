@@ -3,6 +3,7 @@ import httpx
 from app.domain.file_item import FileItem
 from app.domain.marker import Marker, filter_noisy
 from app.domain.errors import ExternalServiceError, InvalidRequestError
+from app.infra.url_config import MARKER_EXTRACT_URL
 
 
 async def extract_file(
@@ -33,7 +34,7 @@ async def extract_file(
     try:
         async with httpx.AsyncClient(timeout=120.0) as client:
             resp = await client.post(
-                "http://localhost:8004/marker/extract",
+                MARKER_EXTRACT_URL,
                 files={
                     "file": (file_item.filename, file_item.data, file_item.content_type)
                 },

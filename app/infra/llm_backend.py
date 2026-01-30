@@ -8,18 +8,16 @@ from openai import OpenAI
 from pydantic import BaseModel
 
 from app.domain.errors import ExternalServiceError
+from app.infra.url_config import OLLAMA_LLM_URL, OPENAI_LLM_URL
 
 
 # Same external LLM service, two structured-output styles.
-OLLAMA_CHAT_URL = "http://localhost:8001/api/chat"
-OPENAI_BASE_URL = "http://localhost:8001/v1"
-OPENAI_API_KEY = "ollama"
 
 
 def _get_openai_client() -> OpenAI:
     return OpenAI(
-        base_url=OPENAI_BASE_URL,
-        api_key=OPENAI_API_KEY,
+        base_url=OPENAI_LLM_URL,
+        api_key="ollama",
     )
 
 
@@ -42,7 +40,7 @@ async def ollama_format_output(
 
     try:
         async with httpx.AsyncClient(timeout=100.0) as client:
-            resp = await client.post(OLLAMA_CHAT_URL, json=payload)
+            resp = await client.post(OLLAMA_LLM_URL, json=payload)
             resp.raise_for_status()
     except (httpx.RequestError, httpx.HTTPStatusError) as exc:
         raise ExternalServiceError(
@@ -76,7 +74,7 @@ async def ollama_output(
 
     try:
         async with httpx.AsyncClient(timeout=200.0) as client:
-            resp = await client.post(OLLAMA_CHAT_URL, json=payload)
+            resp = await client.post(OLLAMA_LLM_URL, json=payload)
             resp.raise_for_status()
     except (httpx.RequestError, httpx.HTTPStatusError) as exc:
         raise ExternalServiceError(

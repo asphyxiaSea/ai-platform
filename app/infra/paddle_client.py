@@ -1,6 +1,7 @@
 import httpx
 from app.domain.file_item import FileItem
 from app.domain.errors import ExternalServiceError, InvalidRequestError
+from app.infra.url_config import PADDLE_EXTRACT_URL
 
 
 async def extract_file(
@@ -20,7 +21,7 @@ async def extract_file(
     try:
         async with httpx.AsyncClient(timeout=120.0) as client:
             resp = await client.post(
-                "http://localhost:8003/paddle/pp-structurev3/predict",
+                PADDLE_EXTRACT_URL,
                 params={
                     "pipeline": "default",
                 },
