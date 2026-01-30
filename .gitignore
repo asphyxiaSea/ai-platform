@@ -10,7 +10,7 @@ venv/
 env/
 
 # Model / OCR / LLM 权重（你这个项目很重要）
-models/
+/models/
 *.bin
 *.safetensors
 *.pt
