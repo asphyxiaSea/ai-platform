@@ -9,8 +9,12 @@ from tenacity import (
     retry_if_exception_type,
 )
 
-from app.infra.ollama import ollama_format_output, ollama_output
-from app.infra.openai import openai_structure_output, openai_raw_output
+from app.infra.llm_backend import (
+    ollama_format_output,
+    ollama_output,
+    openai_structure_output,
+    openai_raw_output,
+)
 from app.domain.errors import AppError, ExternalServiceError
 
 
