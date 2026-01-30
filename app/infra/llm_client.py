@@ -1,5 +1,4 @@
 from typing import Any
-import os
 from pydantic import BaseModel
 import httpx
 from tenacity import (
@@ -18,7 +17,7 @@ from app.infra.llm_backend import (
 from app.domain.errors import AppError, ExternalServiceError
 
 
-DEFAULT_BACKEND = os.environ.get("LLM_BACKEND", "ollama")
+DEFAULT_BACKEND = "ollama"
 
 
 # --- retry wrappers ---
@@ -83,13 +82,10 @@ async def structured_output(
     backend = backend.lower()
 
     try:
-        if backend == "ollama":
-            return await _ollama_format_with_retry(model=model, schema=schema, messages=messages, temperature=temperature)
-
         if backend == "openai":
             return await _openai_structure_with_retry(model=model, schema=schema, messages=messages, temperature=temperature)
 
-        raise ExternalServiceError(message=f"Unknown LLM backend: {backend}")
+        return await _ollama_format_with_retry(model=model, schema=schema, messages=messages, temperature=temperature)
     except AppError:
         raise
     except Exception as exc:
@@ -109,13 +105,10 @@ async def raw_output(
 
     backend = backend.lower()
     try:
-        if backend == "ollama":
-            return await _ollama_raw_with_retry(model=model, messages=messages, temperature=temperature)
-
         if backend == "openai":
             return await _openai_raw_with_retry(model=model, messages=messages, temperature=temperature)
 
-        raise ExternalServiceError(message=f"Unknown LLM backend: {backend}")
+        return await _ollama_raw_with_retry(model=model, messages=messages, temperature=temperature)
     except AppError:
         raise
     except Exception as exc:
