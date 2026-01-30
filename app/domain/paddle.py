@@ -1,0 +1,1 @@
+"""Paddle domain types and pure logic should live here (no HTTP)."""
