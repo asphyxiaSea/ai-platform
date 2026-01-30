@@ -2,7 +2,7 @@ from typing import List
 from pydantic import BaseModel
 from domain.task_config_factory import TaskConfig
 from util.llm_client import structured_output
-from domain.marker import extract_file
+from util.marker_client import extract_file
 from domain.file_item import FileItem
 
 async def marker_services(

@@ -1,11 +1,10 @@
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from typing import List,Optional
 from service.extract_service import extract_service
-from domain import FileItem
+from domain.file_item import FileItem
 from domain.build_schema import get_schema_model
 from domain.task_config_factory import TaskConfig_factory
 from pydantic import BaseModel
-from domain.preprocess import pdf_preprocess
 import json
 
 router = APIRouter(prefix="/files", tags=["files parse"])
@@ -70,14 +69,7 @@ async def parse(
 
     for f in files:
         data = await f.read()
-
-        # === PDF 前处理（仅此处使用 preprocess）===
-        if f.content_type == "application/pdf":
-            data = pdf_preprocess(
-                pdf_bytes=data,
-                preprocess=taskconfig.preprocess,
-            )
-
+        
         file_items.append(
             FileItem(
                 filename=f.filename or "",

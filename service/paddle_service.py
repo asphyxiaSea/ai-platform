@@ -1,8 +1,7 @@
-from typing import List
 from pydantic import BaseModel
 from domain.task_config_factory import TaskConfig
 from domain.file_item import FileItem
-from domain.paddle import extract_file
+from util.paddle_client import extract_file
 from util.llm_client import structured_output
 from domain.postprocess import text_postprocess
 async def paddle_services(
@@ -18,6 +17,7 @@ async def paddle_services(
             target_sections=taskconfig.postprocess.get("target_sections",[])
             if taskconfig.postprocess else None
         )
+        print(final_text)
         
         # 3. text → LLM
         result = await _call_ollama(taskconfig=taskconfig, text=final_text)
@@ -26,7 +26,6 @@ async def paddle_services(
     return {
         "results": results  # 这里定义的键名要与输出变量名一致
     }
-
 
 async def _call_ollama(
     taskconfig: TaskConfig,
