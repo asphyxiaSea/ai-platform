@@ -1,7 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, Form
 from typing import List, Optional
 from app.service.extract_service import extract_service
-from app.api.models.incoming_file import IncomingFile
+from app.domain.file_item import FileItem
 from app.domain.build_schema import get_schema_model
 from app.domain.task_config_factory import TaskConfig_factory
 from app.domain.errors import InvalidRequestError
@@ -78,10 +78,16 @@ async def parse(
     )
 
     # 文件读取
-    file_items = [
-        (await IncomingFile.from_upload_file(f)).to_file_item()
-        for f in files
-    ]
+    file_items = []
+    for f in files:
+        data = await f.read()
+        file_items.append(
+            FileItem(
+                filename=f.filename or "",
+                content_type=f.content_type or "",
+                data=data,
+            )
+        )
 
     return await extract_service(
         taskconfig=taskconfig,
