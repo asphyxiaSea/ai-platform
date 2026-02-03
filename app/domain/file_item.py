@@ -12,6 +12,9 @@ class FileItem(BaseModel):
     data: bytes
     """文件二进制内容"""
 
+    path: Optional[str] = None
+    """文件路径（可选）。上传文件通常为空，若已落盘可提供路径。"""
+
     language: Optional[str] = None
     """文件内容的语言代码（ISO 639-1 / BCP-47）
     示例:

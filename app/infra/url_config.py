@@ -21,3 +21,8 @@ MARKER_EXTRACT_URL = os.environ.get(
 	"MARKER_EXTRACT_URL",
 	"http://localhost:8004/marker/extract",
 )
+
+FUNASR_TRANSCRIBE_PATH_URL = os.environ.get(
+	"FUNASR_TRANSCRIBE_PATH_URL",
+	"http://localhost:8005/funasr/transcribe_path",
+)
