@@ -1,7 +1,7 @@
 import httpx
 from app.domain.file_item import FileItem
 from app.domain.errors import ExternalServiceError, InvalidRequestError
-from app.infra.url_config import PADDLE_EXTRACT_URL
+from app.infra.url_config import PADDLE_EXTRACT_PATH_URL
 
 
 async def extract_file(
@@ -18,15 +18,18 @@ async def extract_file(
             detail=file_item.content_type,
         )
 
+    if not file_item.path:
+        raise InvalidRequestError(
+            message="file_path 不能为空",
+        )
+
     try:
         async with httpx.AsyncClient(timeout=120.0) as client:
             resp = await client.post(
-                PADDLE_EXTRACT_URL,
+                PADDLE_EXTRACT_PATH_URL,
                 params={
                     "pipeline": "default",
-                },
-                files={
-                    "file": (file_item.filename, file_item.data, file_item.content_type)
+                    "path": file_item.path,
                 },
             )
             resp.raise_for_status()

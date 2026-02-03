@@ -1,10 +1,10 @@
 from fastapi import APIRouter, UploadFile, File, Form
 from typing import List, Optional
 from app.service.extract_service import extract_service
-from app.domain.file_item import FileItem
 from app.domain.build_schema import get_schema_model
 from app.domain.task_config_factory import TaskConfig_factory
 from app.domain.errors import InvalidRequestError
+from app.util.file_utils import upload_file_to_item
 from pydantic import BaseModel
 import json
 
@@ -77,19 +77,18 @@ async def parse(
         system_prompt=system_prompt,
     )
 
-    # 文件读取
-    file_items = []
+    # 文件读取 + 落盘
+    uploaded_items = []
     for f in files:
-        data = await f.read()
-        file_items.append(
-            FileItem(
-                filename=f.filename or "",
-                content_type=f.content_type or "",
-                data=data,
-            )
-        )
+        uploaded_items.append(await upload_file_to_item(upload_file=f))
 
-    return await extract_service(
-        taskconfig=taskconfig,
-        file_items=file_items,
-    )
+    file_items = [u.item for u in uploaded_items]
+
+    try:
+        return await extract_service(
+            taskconfig=taskconfig,
+            file_items=file_items,
+        )
+    finally:
+        for u in uploaded_items:
+            await u.cleanup()

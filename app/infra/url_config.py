@@ -17,6 +17,11 @@ PADDLE_EXTRACT_URL = os.environ.get(
 	"PADDLE_EXTRACT_URL",
 	"http://localhost:8003/paddle/pp-structurev3/predict",
 )
+PADDLE_EXTRACT_PATH_URL = os.environ.get(
+	"PADDLE_EXTRACT_PATH_URL",
+	"http://localhost:8003/paddle/pp-structurev3/predict_path",
+)
+
 MARKER_EXTRACT_URL = os.environ.get(
 	"MARKER_EXTRACT_URL",
 	"http://localhost:8004/marker/extract",
