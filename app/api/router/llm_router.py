@@ -1,0 +1,75 @@
+from fastapi import APIRouter, UploadFile, File, Form
+from typing import List, Optional
+from pydantic import BaseModel
+
+from app.domain.build_schema import get_schema_model
+from app.domain.errors import InvalidRequestError
+from app.domain.task_config_factory import TaskConfig_factory
+from app.service.llm_service import multimodal_llm_services
+from app.util.file_utils import upload_file_to_item
+
+router = APIRouter(prefix="/llm", tags=["llm"])
+
+
+class SchemaPayload(BaseModel):
+    schema_name: str
+    fields: list[dict]
+
+
+def clean_text(s: str) -> str:
+    return (
+        s.replace("\u00a0", " ")
+        .replace("\u200b", "")
+        .replace("\ufeff", "")
+    )
+
+
+@router.post("/multimodal")
+async def multimodal_parse(
+    system_prompt: Optional[str] = Form(None),
+    schema: str = Form(...),
+    files: List[UploadFile] = File(...),
+):
+    if not files:
+        raise InvalidRequestError(message="No files provided")
+
+    schema = clean_text(schema)
+
+    try:
+        schema_payload = SchemaPayload.model_validate_json(schema)
+    except Exception as e:
+        raise InvalidRequestError(
+            message="Invalid schema payload",
+            detail=str(e),
+        ) from e
+
+    try:
+        schema_model = get_schema_model(
+            schema_name=schema_payload.schema_name,
+            fields=schema_payload.fields,
+        )
+    except Exception as e:
+        raise InvalidRequestError(
+            message="Schema的格式不正确，检查字段类型及格式",
+            detail=str(e),
+        ) from e
+
+    taskconfig = TaskConfig_factory(
+        schema=schema_model,
+        system_prompt=system_prompt,
+    )
+
+    uploaded_items = []
+    for f in files:
+        uploaded_items.append(await upload_file_to_item(upload_file=f))
+
+    file_items = [u.item for u in uploaded_items]
+
+    try:
+        return await multimodal_llm_services(
+            taskconfig=taskconfig,
+            file_items=file_items,
+        )
+    finally:
+        for u in uploaded_items:
+            await u.cleanup()
