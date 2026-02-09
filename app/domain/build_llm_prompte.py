@@ -41,7 +41,7 @@ def build_ollama_messages(
 def build_multimodal_ollama_messages(
     *,
     taskconfig: LLMTaskConfig,
-    image_base64_list: list[bytes],
+    image_base64_list: list[str],
 ) -> list[dict[str, Any]]:
     schema = taskconfig.schema
 
