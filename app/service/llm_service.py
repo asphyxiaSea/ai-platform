@@ -1,13 +1,12 @@
 from pydantic import BaseModel
 from typing import Any
-from app.domain.task_config_factory import TaskConfig
+from app.domain.task_config_factory import FilesTaskConfig, LLMTaskConfig, LLMTaskMode
 from app.domain.file_item import FileItem
+from app.domain.errors import UnsupportedOperationError
 from app.infra.llm_client import structured_output
-from app.util.pdf_utils import image_bytes_to_base64, pdf_bytes_to_base64_images
-from app.domain.file_item import FileItem
 
 async def multimodal_llm_services(
-    taskconfig: TaskConfig,
+    taskconfig: LLMTaskConfig,
     file_items: list[FileItem],
 ) -> dict[str, list[BaseModel]]:
     results: list[BaseModel] = []
@@ -21,10 +20,27 @@ async def multimodal_llm_services(
     }
 
 
+async def llm_service(
+    *,
+    taskconfig: LLMTaskConfig,
+    file_items: list[FileItem],
+) -> dict[str, list[BaseModel]]:
+    if taskconfig.task_mode == LLMTaskMode.MULTIMODAL:
+        return await multimodal_llm_services(
+            taskconfig=taskconfig,
+            file_items=file_items,
+        )
+
+    raise UnsupportedOperationError(
+        message="未知的任务模式",
+        detail=str(taskconfig.task_mode),
+    )
+
+
 
 async def call_ollama(
     *,
-    taskconfig: TaskConfig,
+    taskconfig: FilesTaskConfig,
     text: str,
 ) -> BaseModel:
     # 1️⃣ 字段说明
@@ -64,7 +80,7 @@ async def call_ollama(
 
 # 多模态调用ollama
 async def call_multimodal_ollama(
-    taskconfig: TaskConfig,
+    taskconfig: LLMTaskConfig,
     image_base64: bytes,
 ) -> BaseModel:
 
@@ -105,7 +121,7 @@ async def call_multimodal_ollama(
 
 async def call_openai(
     *,
-    taskconfig: TaskConfig,
+    taskconfig: FilesTaskConfig,
     text: str,
 ) -> BaseModel:
     messages = [

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, UploadFile, File, Form
 from typing import List, Optional
-from app.service.extract_service import extract_service
+from app.service.file_parse_service import file_parse_service
 from app.domain.build_schema import get_schema_model
-from app.domain.task_config_factory import TaskConfig_factory
+from app.domain.task_config_factory import FilesTaskConfig_factory
 from app.domain.errors import InvalidRequestError
 from app.util.file_utils import upload_file_to_item
 from pydantic import BaseModel
@@ -10,7 +10,7 @@ import json
 
 router = APIRouter(prefix="/files", tags=["files parse"])
 
-
+ 
 class SchemaPayload(BaseModel):
     schema_name: str
     fields: list[dict]
@@ -70,7 +70,7 @@ async def parse(
         ) from e
 
     #  自动装配 taskconfig
-    taskconfig = TaskConfig_factory(
+    taskconfig = FilesTaskConfig_factory(
         schema=schema_model,
         preprocess=preprocess_dict,
         postprocess=postprocess_dict,
@@ -85,7 +85,7 @@ async def parse(
     file_items = [u.item for u in uploaded_items]
 
     try:
-        return await extract_service(
+        return await file_parse_service(
             taskconfig=taskconfig,
             file_items=file_items,
         )

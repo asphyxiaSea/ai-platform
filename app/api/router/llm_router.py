@@ -4,8 +4,8 @@ from pydantic import BaseModel
 
 from app.domain.build_schema import get_schema_model
 from app.domain.errors import InvalidRequestError
-from app.domain.task_config_factory import TaskConfig_factory
-from app.service.llm_service import multimodal_llm_services
+from app.domain.task_config_factory import LLMTaskConfig_factory
+from app.service.llm_service import llm_service
 from app.util.file_utils import upload_file_to_item
 
 router = APIRouter(prefix="/llm", tags=["llm"])
@@ -54,7 +54,7 @@ async def multimodal_parse(
             detail=str(e),
         ) from e
 
-    taskconfig = TaskConfig_factory(
+    taskconfig = LLMTaskConfig_factory(
         schema=schema_model,
         system_prompt=system_prompt,
     )
@@ -66,7 +66,7 @@ async def multimodal_parse(
     file_items = [u.item for u in uploaded_items]
 
     try:
-        return await multimodal_llm_services(
+        return await llm_service(
             taskconfig=taskconfig,
             file_items=file_items,
         )
