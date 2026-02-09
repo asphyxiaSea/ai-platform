@@ -1,7 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, Form
 from typing import List, Optional
-from pydantic import BaseModel
-
+from app.api.models.schema_payload import SchemaPayload
 from app.domain.build_schema import get_schema_model
 from app.domain.errors import InvalidRequestError
 from app.domain.task_config_factory import LLMTaskConfig_factory
@@ -9,20 +8,6 @@ from app.service.llm_service import llm_service
 from app.util.file_utils import upload_file_to_item
 
 router = APIRouter(prefix="/llm", tags=["llm"])
-
-
-class SchemaPayload(BaseModel):
-    schema_name: str
-    fields: list[dict]
-
-
-def clean_text(s: str) -> str:
-    return (
-        s.replace("\u00a0", " ")
-        .replace("\u200b", "")
-        .replace("\ufeff", "")
-    )
-
 
 @router.post("/multimodal")
 async def multimodal_parse(
@@ -33,10 +18,8 @@ async def multimodal_parse(
     if not files:
         raise InvalidRequestError(message="No files provided")
 
-    schema = clean_text(schema)
-
     try:
-        schema_payload = SchemaPayload.model_validate_json(schema)
+        schema_payload = SchemaPayload.parse_json(schema)
     except Exception as e:
         raise InvalidRequestError(
             message="Invalid schema payload",

@@ -5,25 +5,10 @@ from app.domain.build_schema import get_schema_model
 from app.domain.task_config_factory import FilesTaskConfig_factory
 from app.domain.errors import InvalidRequestError
 from app.util.file_utils import upload_file_to_item
-from pydantic import BaseModel
+from app.api.models.schema_payload import SchemaPayload
 import json
 
 router = APIRouter(prefix="/files", tags=["files parse"])
-
- 
-class SchemaPayload(BaseModel):
-    schema_name: str
-    fields: list[dict]
-
-
-# 防止schema错误空格
-def clean_text(s: str) -> str:
-    return (
-        s.replace("\u00a0", " ")
-        .replace("\u200b", "")
-        .replace("\ufeff", "")
-    )
-
 
 @router.post("/parse")
 async def parse(
@@ -36,11 +21,9 @@ async def parse(
     if not files:
         raise InvalidRequestError(message="No files provided")
 
-    schema = clean_text(schema)
-
     #  解析 schema
     try:
-        schema_payload = SchemaPayload.model_validate_json(schema)
+        schema_payload = SchemaPayload.parse_json(schema)
     except Exception as e:
         raise InvalidRequestError(
             message="Invalid schema payload",
