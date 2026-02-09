@@ -7,7 +7,7 @@ from app.domain.postprocess import text_postprocess
 from app.domain.errors import UnsupportedOperationError
 from app.infra.marker_client import extract_file as marker_extract_file
 from app.infra.paddle_client import extract_file as paddle_extract_file
-from app.service.llm_service import call_ollama
+from app.domain.build_llm_prompting import call_ollama
 
 
 async def _apply_pdf_preprocess(

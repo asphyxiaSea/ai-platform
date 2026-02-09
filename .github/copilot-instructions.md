@@ -47,12 +47,11 @@
 
 ## 参考文件（快速跳转）
 - 入口：[main.py](../main.py)
-- 路由：[app/api/router/files_extract.py](../app/api/router/files_extract.py)
-- IncomingFile：[app/api/models/incoming_file.py](../app/api/models/incoming_file.py)
+- 路由：[app/api/router/files_parse_router.py](../app/api/router/files_parse_router.py)
 - Schema 构建：[app/domain/build_schema.py](../app/domain/build_schema.py)
 - TaskConfig：[app/domain/task_config_factory.py](../app/domain/task_config_factory.py)
-- 服务层：[app/service/extract_service.py](../app/service/extract_service.py)
-- LLM 后端：[app/infra/llm_backend.py](../app/infra/llm_backend.py)
+- 服务层：[app/service/files_parse_service.py](../app/service/files_parse_service.py)
+- LLM 客户端：[app/infra/llm_client.py](../app/infra/llm_client.py)
 - URL 配置：[app/infra/url_config.py](../app/infra/url_config.py)
 
 ---
