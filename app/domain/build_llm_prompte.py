@@ -38,10 +38,10 @@ def build_ollama_messages(
     return messages
 
 
-def build_multimodal_messages(
+def build_multimodal_ollama_messages(
     *,
     taskconfig: LLMTaskConfig,
-    image_base64: bytes,
+    image_base64_list: list[bytes],
 ) -> list[dict[str, Any]]:
     schema = taskconfig.schema
 
@@ -66,7 +66,7 @@ def build_multimodal_messages(
         {
             "role": "user",
             "content": "请根据图片完成上述任务。",
-            "images": image_base64,
+            "images": image_base64_list,
         },
     ]
 
