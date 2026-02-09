@@ -7,7 +7,8 @@ from app.domain.postprocess import text_postprocess
 from app.domain.errors import UnsupportedOperationError
 from app.infra.marker_client import extract_file as marker_extract_file
 from app.infra.paddle_client import extract_file as paddle_extract_file
-from app.domain.build_llm_prompting import call_ollama
+from app.domain.build_llm_prompte import build_ollama_messages
+from app.infra.llm_client import structured_output
 
 
 async def _apply_pdf_preprocess(
@@ -53,7 +54,13 @@ async def _marker_services(
         )
 
         # 2. text -> LLM
-        result = await call_ollama(taskconfig=taskconfig, text=text)
+        messages = build_ollama_messages(taskconfig=taskconfig, text=text)
+        result = await structured_output(
+            model=taskconfig.model,
+            schema=taskconfig.schema,
+            messages=messages,
+            temperature=taskconfig.temperature,
+        )
         results.append(result)
 
     return {"results": results}
@@ -76,7 +83,13 @@ async def _paddle_services(
         )
 
         # 2. text -> LLM
-        result = await call_ollama(taskconfig=taskconfig, text=final_text)
+        messages = build_ollama_messages(taskconfig=taskconfig, text=final_text)
+        result = await structured_output(
+            model=taskconfig.model,
+            schema=taskconfig.schema,
+            messages=messages,
+            temperature=taskconfig.temperature,
+        )
         results.append(result)
 
     return {"results": results}

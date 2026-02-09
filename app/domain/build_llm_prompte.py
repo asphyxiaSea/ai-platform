@@ -1,14 +1,12 @@
 from typing import Any
-from pydantic import BaseModel
 from app.domain.task_config_factory import FilesTaskConfig, LLMTaskConfig
-from app.infra.llm_client import structured_output
 
 
-async def call_ollama(
+def build_ollama_messages(
     *,
     taskconfig: FilesTaskConfig,
     text: str,
-) -> BaseModel:
+) -> list[dict[str, str]]:
     # 1) 字段说明
     field_prompts = "\n".join(
         f"- {name}: {field.description}"
@@ -37,18 +35,14 @@ async def call_ollama(
         {"role": "user", "content": user_prompt},
     ]
 
-    return await structured_output(
-        model=taskconfig.model,
-        schema=taskconfig.schema,
-        messages=messages,
-        temperature=taskconfig.temperature,
-    )
+    return messages
 
 
-async def call_multimodal_ollama(
+def build_multimodal_messages(
+    *,
     taskconfig: LLMTaskConfig,
     image_base64: bytes,
-) -> BaseModel:
+) -> list[dict[str, Any]]:
     schema = taskconfig.schema
 
     field_prompts = "\n".join(
@@ -76,19 +70,14 @@ async def call_multimodal_ollama(
         },
     ]
 
-    return await structured_output(
-        model=taskconfig.vl_model,
-        schema=schema,
-        messages=messages,
-        temperature=taskconfig.temperature,
-    )
+    return messages
 
 
-async def call_openai(
+def build_openai_messages(
     *,
     taskconfig: FilesTaskConfig,
     text: str,
-) -> BaseModel:
+) -> list[dict[str, str]]:
     messages = [
         {
             "role": "system",
@@ -100,10 +89,4 @@ async def call_openai(
         },
     ]
 
-    return await structured_output(
-        model=taskconfig.model,
-        schema=taskconfig.schema,
-        messages=messages,
-        temperature=taskconfig.temperature,
-        backend="openai",
-    )
+    return messages

@@ -28,7 +28,7 @@ def _get_openai_client() -> OpenAI:
         api_key="ollama",
     )
 
-
+#  LLM 调用，解析成结构化数据
 async def ollama_format_output(
     *,
     model: str,
@@ -65,7 +65,7 @@ async def ollama_format_output(
 
     return schema.model_validate_json(content)
 
-
+#  LLM 调用，返回原始文本输出（不解析成结构化数据）
 async def ollama_output(
     *,
     model: str,

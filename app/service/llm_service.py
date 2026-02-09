@@ -1,8 +1,9 @@
 from pydantic import BaseModel
 from app.domain.task_config_factory import LLMTaskConfig, LLMTaskMode
-from app.domain.build_llm_prompting import call_multimodal_ollama
+from app.domain.build_llm_prompte import build_multimodal_messages
 from app.domain.file_item import FileItem
 from app.domain.errors import UnsupportedOperationError
+from app.infra.llm_client import structured_output
 
 async def multimodal_llm_service(
     taskconfig: LLMTaskConfig,
@@ -10,8 +11,16 @@ async def multimodal_llm_service(
 ) -> dict[str, list[BaseModel]]:
     results: list[BaseModel] = []
     for file_item in file_items:
-
-        result = await call_multimodal_ollama(taskconfig=taskconfig, image_base64=file_item.data)
+        messages = build_multimodal_messages(
+            taskconfig=taskconfig,
+            image_base64=file_item.data,
+        )
+        result = await structured_output(
+            model=taskconfig.vl_model,
+            schema=taskconfig.schema,
+            messages=messages,
+            temperature=taskconfig.temperature,
+        )
         results.append(result)
 
     return {
