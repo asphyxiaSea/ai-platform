@@ -82,7 +82,7 @@ async def _paddle_services(
     return {"results": results}
 
 
-async def file_parse_service(
+async def files_parse_service(
     *,
     taskconfig: FilesTaskConfig,
     file_items: list[FileItem],

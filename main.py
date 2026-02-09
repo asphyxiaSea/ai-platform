@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 import uvicorn
-from app.api.router.files_parse import router as files_parse_router
+from app.api.router.files_parse_router import router as files_parse_router
 from app.api.router.voice_transcribe import router as voice_transcribe_router
 from app.api.router.llm_router import router as llm_router
 from app.domain.errors import AppError

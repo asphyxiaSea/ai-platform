@@ -1,6 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, Form
 from typing import List, Optional
-from app.service.file_parse_service import file_parse_service
+from app.service.files_parse_service import files_parse_service
 from app.domain.build_schema import get_schema_model
 from app.domain.task_config_factory import FilesTaskConfig_factory
 from app.domain.errors import InvalidRequestError
@@ -85,7 +85,7 @@ async def parse(
     file_items = [u.item for u in uploaded_items]
 
     try:
-        return await file_parse_service(
+        return await files_parse_service(
             taskconfig=taskconfig,
             file_items=file_items,
         )
