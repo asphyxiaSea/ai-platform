@@ -12,19 +12,12 @@ class PdfPreprocessStep:
 
         for file_item in context.file_items:
             if file_item.content_type == "application/pdf":
-                data = await asyncio.to_thread(
+                updated_item = await asyncio.to_thread(
                     pdf_preprocess,
-                    pdf_bytes=file_item.data,
+                    file_item=file_item,
                     preprocess=self.pdf_process,
                 )
-                processed.append(
-                    FileItem(
-                        filename=file_item.filename,
-                        content_type=file_item.content_type,
-                        data=data,
-                        language=file_item.language,
-                    )
-                )
+                processed.append(updated_item)
             else:
                 processed.append(file_item)
 

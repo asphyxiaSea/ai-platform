@@ -1,22 +1,23 @@
 from io import BytesIO
 import re
 from pypdf import PdfReader, PdfWriter
+from app.domain.resources.file_item import FileItem
 
 
 def pdf_preprocess(
-    pdf_bytes: bytes,
+    file_item: FileItem,
     preprocess: dict | None,
-) -> bytes:
+) -> FileItem:
     """PDF 进入模型前处理（页码裁剪）"""
 
     page_range = (preprocess and preprocess.get("page_range"))
     if not isinstance(page_range, str):
-        return pdf_bytes
+        return file_item
 
-    reader = PdfReader(BytesIO(pdf_bytes))
+    reader = PdfReader(BytesIO(file_item.data))
     page_count = len(reader.pages)
     if page_count <= 0:
-        return pdf_bytes
+        return file_item
 
     # ---- 页码解析 ----
     pages: set[int] = set()
@@ -39,7 +40,7 @@ def pdf_preprocess(
     # ------------------
 
     if not pages:
-        return pdf_bytes
+        return file_item
 
     writer = PdfWriter()
     for i in sorted(pages):
@@ -47,4 +48,16 @@ def pdf_preprocess(
 
     out = BytesIO()
     writer.write(out)
-    return out.getvalue()
+    data = out.getvalue()
+
+    if file_item.path:
+        with open(file_item.path, "wb") as f:
+            f.write(data)
+
+    return FileItem(
+        filename=file_item.filename,
+        content_type=file_item.content_type,
+        data=data,
+        path=file_item.path,
+        language=file_item.language,
+    )
