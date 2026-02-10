@@ -4,7 +4,7 @@ from app.domain.templates.voice_transcribe.config import (
     VoiceTaskMode,
 )
 from app.domain.tasks.task import Task, TaskStep
-from app.domain.tasks.voice_steps.transcribe import VoiceTranscribeStep
+from app.domain.tasks.voice_steps.voice_transcribe_step import VoiceTranscribeStep
 
 
 def build_voice_task(config: VoiceTaskConfig) -> Task:

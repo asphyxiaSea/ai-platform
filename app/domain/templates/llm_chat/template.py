@@ -1,6 +1,6 @@
 from app.domain.templates.llm_chat.config import LLMTaskConfig, LLMTaskMode
 from app.domain.errors import UnsupportedOperationError
-from app.domain.tasks.llm_steps.multimodal import MultimodalLLMStep
+from app.domain.tasks.llm_steps.multimodal_llm_step import MultimodalLLMStep
 from app.domain.tasks.task import Task, TaskStep
 
 

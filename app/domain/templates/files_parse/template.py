@@ -1,9 +1,9 @@
 from app.domain.tasks.task import Task, TaskStep
-from app.domain.tasks.files_parse_steps.pdf_preprocess import PdfPreprocessStep
-from app.domain.tasks.files_parse_steps.marker import MarkerStep
-from app.domain.tasks.files_parse_steps.paddle import PaddleStep
-from app.domain.tasks.files_parse_steps.text_preprocess import TextPreprocessStep
-from app.domain.tasks.files_parse_steps.llm_extract import LLMExtractStep
+from app.domain.tasks.files_parse_steps.pdf_preprocess_step import PdfPreprocessStep
+from app.domain.tasks.files_parse_steps.marker_step import MarkerStep
+from app.domain.tasks.files_parse_steps.paddle_step import PaddleStep
+from app.domain.tasks.files_parse_steps.text_preprocess_step import TextPreprocessStep
+from app.domain.tasks.files_parse_steps.llm_extract_step import LLMExtractStep
 from app.domain.templates.files_parse.config import FilesTaskConfig, FilesTaskMode
 
 
