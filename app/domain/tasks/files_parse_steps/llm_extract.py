@@ -1,9 +1,10 @@
 from app.domain.capabilities.llm.build_llm_prompte import build_ollama_messages
+from app.domain.templates.files_parse.config import FilesTaskConfig
 from app.infra.llm_client import structured_output
 
 
 class LLMExtractStep:
-    def __init__(self, config):
+    def __init__(self, config: FilesTaskConfig) -> None:
         self.config = config
 
     async def execute(self, context):

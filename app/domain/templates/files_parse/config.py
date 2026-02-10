@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Literal, Type
+from typing import Any, Type
 from pydantic import BaseModel
 from app.domain.marker import Marker
 
@@ -12,8 +12,8 @@ DEFAULT_SYSTEM_PROMPT = """
 """.strip()
 
 class FilesTaskMode(str, Enum):
-    FILESTOTEXTBYMARKER = "filestotextbymarker"
-    FILESTOTEXTBYPADDLE = "filestotextbypaddle"
+    FILESTOTEXTBYMARKER = "marker"
+    FILESTOTEXTBYPADDLE = "paddle"
 
 
 @dataclass
@@ -34,8 +34,8 @@ class FilesTaskConfig:
     marker: Marker | None = None
 
     # process
-    preprocess: dict[str, Any] | None = None
-    postprocess: dict[str, Any] | None = None
+    pdf_process: dict[str, Any] | None = None
+    text_process: dict[str, Any] | None = None
 
 
 def FilesTaskConfig_factory(
@@ -48,15 +48,3 @@ def FilesTaskConfig_factory(
     if system_prompt is None:
         system_prompt = DEFAULT_SYSTEM_PROMPT
     return FilesTaskConfig(schema=schema, system_prompt=system_prompt, **overrides)
-
-
-@dataclass
-class FilesParseConfig:
-    parser_backend: Literal["marker", "paddle"]
-    model: str
-    schema: type[BaseModel]
-    temperature: float = 0.1
-    system_prompt: str | None = DEFAULT_SYSTEM_PROMPT
-    pdf_process: dict | None = None
-    text_process: dict | None = None
-    marker: Marker | None = None

@@ -1,11 +1,11 @@
 from typing import Any
-from app.domain.templates.files_parse.config import FilesParseConfig
+from app.domain.templates.files_parse.config import FilesTaskConfig
 from app.domain.templates.llm_chat.config import LLMTaskConfig
 
 
 def build_ollama_messages(
     *,
-    taskconfig: FilesParseConfig,
+    taskconfig: FilesTaskConfig,
     text: str,
 ) -> list[dict[str, str]]:
     # 1) 字段说明
@@ -76,7 +76,7 @@ def build_multimodal_ollama_messages(
 
 def build_openai_messages(
     *,
-    taskconfig: FilesParseConfig,
+    taskconfig: FilesTaskConfig,
     text: str,
 ) -> list[dict[str, str]]:
     messages = [
