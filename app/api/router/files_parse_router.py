@@ -1,8 +1,8 @@
 from fastapi import APIRouter, UploadFile, File, Form
 from typing import List, Optional
 from app.service.files_parse_service import files_parse_service
-from app.domain.build_schema import get_schema_model
-from app.domain.task_config_factory import FilesTaskConfig_factory
+from app.domain.resources.build_schema import get_schema_model
+from app.domain.templates.files_parse.config import FilesParseConfig
 from app.domain.errors import InvalidRequestError
 from app.util.file_utils import upload_file_to_item
 from app.api.models.schema_payload import SchemaPayload
@@ -52,12 +52,14 @@ async def parse(
             detail=str(e),
         ) from e
 
-    #  自动装配 taskconfig
-    taskconfig = FilesTaskConfig_factory(
+    config = FilesParseConfig(
+        parser_backend="paddle",
+        model="gemma3:12b",
         schema=schema_model,
-        preprocess=preprocess_dict,
-        postprocess=postprocess_dict,
+        temperature=0.1,
         system_prompt=system_prompt,
+        pdf_process=preprocess_dict,
+        text_process=postprocess_dict,
     )
 
     # 文件读取 + 落盘
@@ -69,7 +71,7 @@ async def parse(
 
     try:
         return await files_parse_service(
-            taskconfig=taskconfig,
+            config=config,
             file_items=file_items,
         )
     finally:

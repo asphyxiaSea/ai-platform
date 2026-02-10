@@ -1,10 +1,11 @@
 from typing import Any
-from app.domain.task_config_factory import FilesTaskConfig, LLMTaskConfig
+from app.domain.templates.files_parse.config import FilesParseConfig
+from app.domain.templates.llm_chat.config import LLMTaskConfig
 
 
 def build_ollama_messages(
     *,
-    taskconfig: FilesTaskConfig,
+    taskconfig: FilesParseConfig,
     text: str,
 ) -> list[dict[str, str]]:
     # 1) 字段说明
@@ -15,7 +16,7 @@ def build_ollama_messages(
     )
 
     # 2) 任务说明（schema docstring）
-    task_description = taskconfig.system_prompt.strip()
+    task_description = (taskconfig.system_prompt or "").strip()
 
     # 3) system prompt：规则 + 约束
     system_prompt = f"""
@@ -75,7 +76,7 @@ def build_multimodal_ollama_messages(
 
 def build_openai_messages(
     *,
-    taskconfig: FilesTaskConfig,
+    taskconfig: FilesParseConfig,
     text: str,
 ) -> list[dict[str, str]]:
     messages = [

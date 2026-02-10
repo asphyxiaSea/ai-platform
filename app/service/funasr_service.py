@@ -1,7 +1,8 @@
-from app.domain.file_item import FileItem
-from app.domain.task_config_factory import VoiceTaskConfig, VoiceTaskMode
-from app.domain.errors import UnsupportedOperationError
-from app.infra.funasr_client import transcribe
+from app.domain.resources.context import TaskContext
+from app.domain.resources.file_item import FileItem
+from app.domain.templates.voice_transcribe.config import VoiceTaskConfig
+from app.domain.templates.voice_transcribe.template import build_voice_task
+from app.domain.tasks.task_runner import run_task
 
 
 async def transcribe_service(
@@ -9,10 +10,6 @@ async def transcribe_service(
     file_item: FileItem,
     taskconfig: VoiceTaskConfig,
 ) -> dict[str, str]:
-    if taskconfig.task_mode != VoiceTaskMode.TRANSCRIBE:
-        raise UnsupportedOperationError(
-            message="未知的任务模式",
-            detail=str(taskconfig.task_mode),
-        )
-    text = await transcribe(file_path=file_item.path or "", model_key=taskconfig.model_key)
-    return {"text": text}
+    task = build_voice_task(taskconfig)
+    context = TaskContext(file_items=[file_item])
+    return await run_task(task, context)

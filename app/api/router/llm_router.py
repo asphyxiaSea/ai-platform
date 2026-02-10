@@ -1,9 +1,9 @@
 from fastapi import APIRouter, UploadFile, File, Form
 from typing import List, Optional
 from app.api.models.schema_payload import SchemaPayload
-from app.domain.build_schema import get_schema_model
+from app.domain.resources.build_schema import get_schema_model
 from app.domain.errors import InvalidRequestError
-from app.domain.task_config_factory import LLMTaskConfig_factory
+from app.domain.templates.llm_chat.config import LLMTaskConfig_factory
 from app.service.llm_service import llm_service
 from app.util.file_utils import upload_file_to_item
 

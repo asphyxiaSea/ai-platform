@@ -1,6 +1,6 @@
 from fastapi import APIRouter, UploadFile, File
 from app.service.funasr_service import transcribe_service
-from app.domain.task_config_factory import VoiceTaskConfig_factory
+from app.domain.templates.voice_transcribe.config import VoiceTaskConfig_factory
 from app.util.file_utils import upload_file_to_item
 
 router = APIRouter(prefix="/voice", tags=["voice_transcribe"])

@@ -1,4 +1,4 @@
-from .file_item import FileItem
+from .resources.file_item import FileItem
 from .marker import Marker
 from .errors import (
     AppError,

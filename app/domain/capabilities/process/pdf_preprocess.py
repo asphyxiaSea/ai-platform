@@ -7,7 +7,7 @@ def pdf_preprocess(
     pdf_bytes: bytes,
     preprocess: dict | None,
 ) -> bytes:
-    """PDF 进入 Paddle 前的前处理（页码裁剪）"""
+    """PDF 进入模型前处理（页码裁剪）"""
 
     page_range = (preprocess and preprocess.get("page_range"))
     if not isinstance(page_range, str):

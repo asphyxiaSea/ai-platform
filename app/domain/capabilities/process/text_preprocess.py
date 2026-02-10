@@ -47,7 +47,7 @@ def split_by_titles(text: str):
     return sections
 
 
-def text_postprocess(
+def text_preprocess(
     full_text: str,
     target_sections: list[str] | None = None,
 ) -> str:

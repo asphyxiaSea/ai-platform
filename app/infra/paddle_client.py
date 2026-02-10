@@ -1,5 +1,5 @@
 import httpx
-from app.domain.file_item import FileItem
+from app.domain.resources.file_item import FileItem
 from app.domain.errors import ExternalServiceError, InvalidRequestError
 from app.infra.url_config import PADDLE_EXTRACT_PATH_URL
 

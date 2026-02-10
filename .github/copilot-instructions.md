@@ -23,7 +23,7 @@
 - 文件处理链：
   - `FILESTOTEXTBYMARKER`：Marker 抽取文本 → LLM 结构化输出。
   - `FILESTOTEXTBYPADDLE`：Paddle 抽取文本 → 文本后处理 → LLM 结构化输出。
-- LLM 提示词构造：放在 [app/domain/build_llm_prompte.py](../app/domain/build_llm_prompte.py)，只构造 `messages`，不做 IO。
+- LLM 提示词构造：放在 [app/domain/capabilities/llm/build_llm_prompte.py](../app/domain/capabilities/llm/build_llm_prompte.py)，只构造 `messages`，不做 IO。
 - LLM 调用：统一通过 [app/infra/llm_client.py](../app/infra/llm_client.py) 的 `structured_output`/`raw_output`。
 - 错误处理：统一异常基类为 `AppError`，FastAPI 中间件统一格式化响应。
 - 返回值：服务层返回 `{"results": list[BaseModel]}`（不要随意改为 dict 或单对象）。
@@ -62,10 +62,10 @@
 ## 参考文件（快速跳转）
 - 入口：[main.py](../main.py)
 - 路由：[app/api/router/files_parse_router.py](../app/api/router/files_parse_router.py)
-- Schema 构建：[app/domain/build_schema.py](../app/domain/build_schema.py)
+- Schema 构建：[app/domain/resources/build_schema.py](../app/domain/resources/build_schema.py)
 - TaskConfig：[app/domain/task_config_factory.py](../app/domain/task_config_factory.py)
 - 服务层：[app/service/files_parse_service.py](../app/service/files_parse_service.py)
-- LLM 提示词构造：[app/domain/build_llm_prompte.py](../app/domain/build_llm_prompte.py)
+- LLM 提示词构造：[app/domain/capabilities/llm/build_llm_prompte.py](../app/domain/capabilities/llm/build_llm_prompte.py)
 - LLM 客户端：[app/infra/llm_client.py](../app/infra/llm_client.py)
 - URL 配置：[app/infra/url_config.py](../app/infra/url_config.py)
 

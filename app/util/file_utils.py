@@ -3,7 +3,7 @@ import os
 import tempfile
 from dataclasses import dataclass
 from fastapi import UploadFile
-from app.domain.file_item import FileItem
+from app.domain.resources.file_item import FileItem
 
 
 @dataclass(slots=True)
