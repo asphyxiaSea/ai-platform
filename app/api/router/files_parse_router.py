@@ -15,7 +15,7 @@ async def parse(
     system_prompt: Optional[str] = Form(None),
     preprocess: Optional[str] = Form(None),
     postprocess: Optional[str] = Form(None),
-    schema: str = Form(...),
+    schema_payload_json: str = Form(...),
     files: List[UploadFile] = File(...),
 ):
     if not files:
@@ -23,7 +23,7 @@ async def parse(
 
     #  解析 schema
     try:
-        schema_payload = SchemaPayload.parse_json(schema)
+        schema_payload = SchemaPayload.parse_json(schema_payload_json)
     except Exception as e:
         raise InvalidRequestError(
             message="Invalid schema payload",

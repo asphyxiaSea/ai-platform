@@ -12,14 +12,14 @@ router = APIRouter(prefix="/llm", tags=["llm"])
 @router.post("/multimodal")
 async def multimodal_parse(
     system_prompt: Optional[str] = Form(None),
-    schema: str = Form(...),
+    schema_payload_json: str = Form(...),
     files: List[UploadFile] = File(...),
 ):
     if not files:
         raise InvalidRequestError(message="No files provided")
 
     try:
-        schema_payload = SchemaPayload.parse_json(schema)
+        schema_payload = SchemaPayload.parse_json(schema_payload_json)
     except Exception as e:
         raise InvalidRequestError(
             message="Invalid schema payload",
