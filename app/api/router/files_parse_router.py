@@ -13,8 +13,8 @@ router = APIRouter(prefix="/files", tags=["files parse"])
 @router.post("/parse")
 async def parse(
     system_prompt: Optional[str] = Form(None),
-    preprocess: Optional[str] = Form(None),
-    postprocess: Optional[str] = Form(None),
+    pdf_process: Optional[str] = Form(None),
+    text_process: Optional[str] = Form(None),
     schema_payload_json: str = Form(...),
     files: List[UploadFile] = File(...),
 ):
@@ -44,8 +44,8 @@ async def parse(
         ) from e
     # 前处理
     try:
-        preprocess_dict = json.loads(preprocess) if preprocess else None
-        postprocess_dict = json.loads(postprocess) if postprocess else None
+        preprocess_dict = json.loads(pdf_process) if pdf_process else None
+        postprocess_dict = json.loads(text_process) if text_process else None
     except json.JSONDecodeError as e:
         raise InvalidRequestError(
             message="Invalid preprocess or postprocess JSON",
