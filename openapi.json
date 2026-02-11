@@ -26,13 +26,13 @@
                   "system_prompt": {
                     "type": "string"
                   },
-                  "schema": {
+                  "schema_payload_json": {
                     "type": "string"
                   },
-                  "preprocess": {
+                  "pdf_process": {
                     "type": "string"
                   },
-                  "postprocess": {
+                  "text_process": {
                     "type": "string"
                   },
                 "files": {
