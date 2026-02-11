@@ -1,71 +1,55 @@
-{
-  "openapi": "3.0.3",
-  "info": {
-    "title": "ai-platform",
-    "description": "ai-platform",
-    "version": "1.0.0"
-  },
-  "servers": [
-    {
-      "url": "https://oa1.gxlky.com.cn"
+import os
+import re
+
+
+def normalize(text: str):
+    text = text.lower()
+    text = re.sub(r"\s+", "", text)
+    text = re.sub(r"[^\w\u4e00-\u9fa5]", "", text)
+    return text
+
+
+def load_sensitive_words_from_dir(dir_path: str) -> list[str]:
+    sensitive_words = []
+
+    for filename in os.listdir(dir_path):
+        if not filename.endswith(".txt"):
+            continue
+
+        file_path = os.path.join(dir_path, filename)
+        if not os.path.isfile(file_path):
+            continue
+
+        with open(file_path, "r", encoding="utf-8") as f:
+            for line in f:
+                word = line.strip()
+                if word:
+                    sensitive_words.append(word)
+
+    return sensitive_words
+
+
+def main():
+    # 1️⃣ 从本地文件夹加载敏感词
+    sensitive_dir = "assets/sensitive_words_files"
+    sensitive_words = load_sensitive_words_from_dir(sensitive_dir)
+
+    # 2️⃣ 测试文本
+    text = "这是一个测试文本，包含敏感词：习近平。"
+
+    replaced_text = text
+    norm_text = normalize(text)
+
+    # 3️⃣ 执行替换
+    for w in sensitive_words:
+        if w in replaced_text or w in norm_text:
+            replaced_text = replaced_text.replace(w, "*" * len(w))
+
+    return {
+        "result": replaced_text
     }
-  ],
-  "paths": {
-    "/ai-platform/files/parse": {
-      "post": {
-        "operationId": "FilesParse",
-        "summary": "输入图像或PDF调用模型推理，输出结构化信息。",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "required": ["schema","files"],
-                "properties": {
-                  "system_prompt": {
-                    "type": "string"
-                  },
-                  "schema": {
-                    "type": "string"
-                  },
-                  "preprocess": {
-                    "type": "string"
-                  },
-                  "postprocess": {
-                    "type": "string"
-                  },
-                "files": {
-                    "type": "array",
-                    "items":{
-                       "type": "string",
-                       "format": "binary"
-                     }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "模型回复",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "content": {
-                      "type": "object",
-                      "additionalProperties": true
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-  }
-}
+
+
+if __name__ == "__main__":
+    result = main()
+    print(result)
