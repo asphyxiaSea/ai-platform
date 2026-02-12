@@ -13,12 +13,16 @@ DEFAULT_SYSTEM_PROMPT = """
 
 
 class LLMTaskMode(str, Enum):
+    CHAT = "chat"
     MULTIMODAL = "multimodal"
 
 
 @dataclass
 class LLMTaskConfig:
     schema: Type[BaseModel]
+
+    user_prompt: str = ""
+    has_images: bool = False
 
     # LLM / VLM
     model: str = "gemma3:12b"
@@ -29,16 +33,28 @@ class LLMTaskConfig:
     max_tokens: int = 2048
     system_prompt: str = DEFAULT_SYSTEM_PROMPT
 
-    task_mode: LLMTaskMode = LLMTaskMode.MULTIMODAL
+    task_mode: LLMTaskMode = LLMTaskMode.CHAT
 
 
 def LLMTaskConfig_factory(
     *,
     schema: Type[BaseModel],
     system_prompt: str | None = None,
+    user_prompt: str = "",
+    has_images: bool = False,
     **overrides,
 ) -> LLMTaskConfig:
     """构建 LLMTaskConfig（仅覆盖需要的字段）"""
     if system_prompt is None:
         system_prompt = DEFAULT_SYSTEM_PROMPT
-    return LLMTaskConfig(schema=schema, system_prompt=system_prompt, **overrides)
+    task_mode = overrides.pop("task_mode", None)
+    if task_mode is None:
+        task_mode = LLMTaskMode.MULTIMODAL if has_images else LLMTaskMode.CHAT
+    return LLMTaskConfig(
+        schema=schema,
+        system_prompt=system_prompt,
+        user_prompt=user_prompt,
+        has_images=has_images,
+        task_mode=task_mode,
+        **overrides,
+    )

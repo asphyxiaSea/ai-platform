@@ -16,6 +16,8 @@ class FilesTaskMode(str, Enum):
     FILESTOTEXTBYPADDLE = "paddle"
 
 
+
+
 @dataclass
 class FilesTaskConfig:
     schema: Type[BaseModel]

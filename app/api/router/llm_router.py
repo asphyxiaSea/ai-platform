@@ -9,14 +9,13 @@ from app.util.file_utils import upload_file_to_item
 
 router = APIRouter(prefix="/llm", tags=["llm"])
 
-@router.post("/multimodal")
-async def multimodal_parse(
+@router.post("/structure")
+async def structure_parse(
     system_prompt: Optional[str] = Form(None),
+    user_prompt: str = Form(...),
     schema_payload_json: str = Form(...),
-    files: List[UploadFile] = File(...),
+    image_files: Optional[List[UploadFile]] = File(None),
 ):
-    if not files:
-        raise InvalidRequestError(message="No files provided")
 
     try:
         schema_payload = SchemaPayload.parse_json(schema_payload_json)
@@ -40,10 +39,12 @@ async def multimodal_parse(
     taskconfig = LLMTaskConfig_factory(
         schema=schema_model,
         system_prompt=system_prompt,
+        user_prompt=user_prompt,
+        has_images=bool(image_files),
     )
 
     uploaded_items = []
-    for f in files:
+    for f in image_files or []:
         uploaded_items.append(await upload_file_to_item(upload_file=f))
 
     file_items = [u.item for u in uploaded_items]

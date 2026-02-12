@@ -12,7 +12,7 @@ class LLMExtractStep:
         for text in context.get_output("texts", []):
             messages = build_ollama_messages(
                 taskconfig=self.config,
-                text=text,
+                prompt=text,
             )
             result = await structured_output(
                 model=self.config.model,
