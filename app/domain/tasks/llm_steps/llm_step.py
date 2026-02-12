@@ -15,13 +15,17 @@ class LLMStep:
         ]
         messages = build_ollama_messages(
             taskconfig=self._config,
-            prompt=self._config.user_prompt,
+            text=self._config.llm.user_prompt,
             image_base64_list=image_base64_list,
         )
-        model = self._config.vl_model if image_base64_list else self._config.model
+        model = (
+            self._config.llm.vl_model
+            if image_base64_list
+            else self._config.llm.model
+        )
         context.result = await structured_output(
             model=model,
             schema=self._config.schema,
             messages=messages,
-            temperature=self._config.temperature,
+            temperature=self._config.llm.temperature,
         )

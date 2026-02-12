@@ -1,12 +1,18 @@
-from typing import Any, Iterable
+from typing import Any, Iterable, Protocol
+from pydantic import BaseModel
 from app.domain.templates.files_parse.config import FilesTaskConfig
-from app.domain.templates.llm_chat.config import LLMTaskConfig
+from app.domain.capabilities.llm.llm_config import LLMConfig
+
+
+class HasLLMConfig(Protocol):
+    schema: type[BaseModel]
+    llm: LLMConfig
 
 
 def build_ollama_messages(
     *,
-    taskconfig: FilesTaskConfig | LLMTaskConfig,
-    prompt: str,
+    taskconfig: HasLLMConfig,
+    text: str,
     image_base64_list: Iterable[str] | None = None,
 ) -> list[dict[str, Any]]:
     field_prompts = "\n".join(
@@ -15,7 +21,7 @@ def build_ollama_messages(
         if field.description
     )
 
-    task_description = (getattr(taskconfig, "system_prompt", "") or "").strip()
+    task_description = (taskconfig.llm.system_prompt or "").strip()
 
     system_prompt = f"""
 【任务说明】
@@ -27,7 +33,7 @@ def build_ollama_messages(
 
     messages: list[dict[str, Any]] = [
         {"role": "system", "content": system_prompt},
-        {"role": "user", "content": prompt.strip()},
+        {"role": "user", "content": text.strip()},
     ]
 
     if image_base64_list:

@@ -2,10 +2,7 @@ from fastapi import APIRouter, UploadFile, File, Form
 from typing import List, Optional
 from app.service.files_parse_service import files_parse_service
 from app.domain.resources.build_schema import get_schema_model
-from app.domain.templates.files_parse.config import (
-    FilesTaskConfig_factory,
-    FilesTaskMode,
-)
+from app.domain.templates.files_parse.config import FilesTaskConfig_factory
 from app.domain.errors import InvalidRequestError
 from app.util.file_utils import upload_file_to_item
 from app.api.models.schema_payload import SchemaPayload
@@ -18,7 +15,6 @@ async def parse(
     system_prompt: Optional[str] = Form(None),
     pdf_process: Optional[str] = Form(None),
     text_process: Optional[str] = Form(None),
-    task_mode: FilesTaskMode = Form(FilesTaskMode.FILESTOTEXTBYPADDLE),
     schema_payload_json: str = Form(...),
     files: List[UploadFile] = File(...),
 ):
@@ -59,9 +55,6 @@ async def parse(
     config = FilesTaskConfig_factory(
         schema=schema_model,
         system_prompt=system_prompt,
-        task_mode=task_mode,
-        model="gemma3:12b",
-        temperature=0.1,
         pdf_process=preprocess_dict,
         text_process=postprocess_dict,
     )
