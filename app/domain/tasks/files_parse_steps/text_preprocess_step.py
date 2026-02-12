@@ -7,7 +7,7 @@ class TextPreprocessStep:
 
     async def execute(self, context):
         texts = []
-        for text in context.texts or []:
+        for text in context.get_output("texts", []):
             final_text = text_preprocess(
                 text,
                 target_sections=self.text_process.get("target_sections", [])
@@ -16,4 +16,4 @@ class TextPreprocessStep:
             )
             texts.append(final_text)
 
-        context.texts = texts
+        context.set_output("texts", texts)

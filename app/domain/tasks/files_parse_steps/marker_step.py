@@ -14,4 +14,4 @@ class MarkerStep:
             )
             texts.append(text)
 
-        context.texts = texts
+        context.set_output("texts", texts)

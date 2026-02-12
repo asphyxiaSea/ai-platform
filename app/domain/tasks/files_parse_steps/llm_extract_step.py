@@ -9,7 +9,7 @@ class LLMExtractStep:
 
     async def execute(self, context):
         results = []
-        for text in context.texts or []:
+        for text in context.get_output("texts", []):
             messages = build_ollama_messages(
                 taskconfig=self.config,
                 text=text,
