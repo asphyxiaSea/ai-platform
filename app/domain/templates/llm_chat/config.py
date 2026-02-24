@@ -23,10 +23,9 @@ def LLMTaskConfig_factory(
     user_prompt: str = "",
     has_images: bool = False,
     llm_config: LLMConfig | None = None,
-    **overrides,
+    task_mode: LLMTaskMode | None = None,
 ) -> LLMTaskConfig:
     """构建 LLMTaskConfig（仅覆盖需要的字段）"""
-    task_mode = overrides.pop("task_mode", None)
     if task_mode is None:
         task_mode = LLMTaskMode.MULTIMODAL if has_images else LLMTaskMode.CHAT
     merged_overrides: dict[str, Any] = {
@@ -43,5 +42,4 @@ def LLMTaskConfig_factory(
         schema=schema,
         has_images=has_images,
         llm=llm,
-        **overrides,
     )

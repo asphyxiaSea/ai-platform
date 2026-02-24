@@ -23,7 +23,9 @@ def FilesTaskConfig_factory(
     schema: Type[BaseModel],
     system_prompt: str | None = None,
     llm_config: LLMConfig | None = None,
-    **overrides,
+    paddle: PaddleConfig | None = None,
+    pdf_process: dict[str, Any] | None = None,
+    text_process: dict[str, Any] | None = None,
 ) -> FilesTaskConfig:
     """构建 FilesTaskConfig（仅覆盖需要的字段）"""
     llm = build_llm_config(
@@ -31,4 +33,10 @@ def FilesTaskConfig_factory(
         schema=schema,
         system_prompt=system_prompt,
     )
-    return FilesTaskConfig(schema=schema, llm=llm, **overrides)
+    return FilesTaskConfig(
+        schema=schema,
+        llm=llm,
+        paddle=paddle,
+        pdf_process=pdf_process,
+        text_process=text_process,
+    )
