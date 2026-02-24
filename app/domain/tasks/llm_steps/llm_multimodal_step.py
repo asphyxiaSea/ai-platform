@@ -15,7 +15,7 @@ class LLMMultimodalStep:
         ]
         messages = build_ollama_messages(
             taskconfig=self._config,
-            text=self._config.llm.user_prompt,
+            text=self._config.user_prompt,
             image_base64_list=image_base64_list,
         )
         model = self._config.llm.vl_model

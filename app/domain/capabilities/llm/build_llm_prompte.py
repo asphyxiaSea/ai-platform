@@ -1,12 +1,12 @@
 from typing import Any, Iterable, Protocol
 from pydantic import BaseModel
 from app.domain.templates.files_parse.config import FilesTaskConfig
-from app.domain.capabilities.llm.llm_config import LLMConfig
+from app.domain.capabilities.llm.llm_config import DEFAULT_SYSTEM_PROMPT
 
 
 class HasLLMConfig(Protocol):
     schema: type[BaseModel]
-    llm: LLMConfig
+    system_prompt: str
 
 
 def build_ollama_messages(
@@ -21,7 +21,7 @@ def build_ollama_messages(
         if field.description
     )
 
-    task_description = (taskconfig.llm.system_prompt or "").strip()
+    task_description = (taskconfig.system_prompt or DEFAULT_SYSTEM_PROMPT).strip()
 
     system_prompt = f"""
 【任务说明】
