@@ -2,7 +2,7 @@ from fastapi import APIRouter, UploadFile, File, Form
 from typing import List, Optional
 from app.service.files_parse_service import files_parse_service
 from app.domain.resources.build_schema import get_schema_model
-from app.domain.templates.files_parse.config import FilesTaskConfig_factory
+from app.domain.templates.files_parse.config import FilesTaskConfig
 from app.domain.errors import InvalidRequestError
 from app.util.file_utils import upload_file_to_item
 from app.api.models.schema_payload import SchemaPayload
@@ -52,7 +52,7 @@ async def parse(
             detail=str(e),
         ) from e
 
-    config = FilesTaskConfig_factory(
+    config = FilesTaskConfig(
         schema=schema_model,
         system_prompt=system_prompt,
         pdf_process=preprocess_dict,
