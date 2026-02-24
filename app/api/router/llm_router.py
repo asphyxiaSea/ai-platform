@@ -3,7 +3,7 @@ from typing import List, Optional
 from app.api.models.schema_payload import SchemaPayload
 from app.domain.resources.build_schema import get_schema_model
 from app.domain.errors import InvalidRequestError
-from app.domain.templates.llm_chat.config import LLMTaskConfig_factory
+from app.domain.templates.llm_chat.config import LLMTaskConfig_factory, LLMTaskMode
 from app.service.llm_service import llm_service
 from app.util.file_utils import upload_file_to_item
 
@@ -36,10 +36,14 @@ async def structure_parse(
             detail=str(e),
         ) from e
 
+    task_mode = (
+        LLMTaskMode.MULTIMODAL if image_files else LLMTaskMode.CHAT
+    )
     taskconfig = LLMTaskConfig_factory(
         schema=schema_model,
         system_prompt=system_prompt,
         user_prompt=user_prompt,
+        task_mode=task_mode,
     )
 
     uploaded_items = []
