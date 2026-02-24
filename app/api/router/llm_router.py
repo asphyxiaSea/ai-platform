@@ -40,7 +40,6 @@ async def structure_parse(
         schema=schema_model,
         system_prompt=system_prompt,
         user_prompt=user_prompt,
-        has_images=bool(image_files),
     )
 
     uploaded_items = []

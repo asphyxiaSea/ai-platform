@@ -22,17 +22,15 @@ def FilesTaskConfig_factory(
     *,
     schema: Type[BaseModel],
     system_prompt: str | None = None,
-    llm_config: LLMConfig | None = None,
     paddle: PaddleConfig | None = None,
     pdf_process: dict[str, Any] | None = None,
     text_process: dict[str, Any] | None = None,
 ) -> FilesTaskConfig:
     """构建 FilesTaskConfig（仅覆盖需要的字段）"""
-    llm = build_llm_config(
-        base=llm_config,
-        schema=schema,
-        system_prompt=system_prompt,
-    )
+    overrides: dict[str, Any] = {"schema": schema}
+    if system_prompt is not None:
+        overrides["system_prompt"] = system_prompt
+    llm = build_llm_config(overrides=overrides)
     return FilesTaskConfig(
         schema=schema,
         llm=llm,
