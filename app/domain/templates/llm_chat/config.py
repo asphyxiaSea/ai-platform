@@ -29,7 +29,6 @@ def LLMTaskConfig_factory(
     merged_overrides: dict[str, Any] = {
         "schema": schema,
         "user_prompt": user_prompt,
-        "task_mode": task_mode,
     }
     if system_prompt is not None:
         merged_overrides["system_prompt"] = system_prompt
