@@ -14,7 +14,8 @@ class LLMMultimodalStep:
             image_bytes_to_base64(file_item.data) for file_item in context.file_items
         ]
         messages = build_ollama_messages(
-            taskconfig=self._config,
+            schema=self._config.schema,
+            system_prompt=self._config.system_prompt,
             text=self._config.user_prompt,
             image_base64_list=image_base64_list,
         )

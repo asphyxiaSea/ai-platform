@@ -10,7 +10,8 @@ class LLMChatStep:
 
     async def execute(self, context: TaskContext) -> None:
         messages = build_ollama_messages(
-            taskconfig=self._config,
+            schema=self._config.schema,
+            system_prompt=self._config.system_prompt,
             text=self._config.user_prompt,
         )
         model = self._config.llm.model

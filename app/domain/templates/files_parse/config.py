@@ -1,16 +1,14 @@
 from dataclasses import dataclass, field
 from typing import Any, Type
 from pydantic import BaseModel
-from app.domain.capabilities.llm.llm_config import (
-    DEFAULT_SYSTEM_PROMPT,
-    LLMConfig,
-)
+from app.domain.capabilities.llm.llm_config import LLMConfig
+from app.domain.capabilities.llm.build_llm_prompte import DEFAULT_SYSTEM_PROMPT
 from app.domain.capabilities.paddle.paddle_config import PaddleConfig
 
 @dataclass
 class FilesTaskConfig:
     schema: Type[BaseModel]
-    system_prompt: str = DEFAULT_SYSTEM_PROMPT
+    system_prompt: str | None = None
     user_prompt: str = ""
 
     llm: LLMConfig = field(default_factory=LLMConfig)
@@ -33,8 +31,6 @@ def FilesTaskConfig_factory(
     text_process: dict[str, Any] | None = None,
 ) -> FilesTaskConfig:
     """构建 FilesTaskConfig（仅覆盖需要的字段）"""
-    if system_prompt is None:
-        system_prompt = DEFAULT_SYSTEM_PROMPT
     llm = LLMConfig()
     return FilesTaskConfig(
         schema=schema,

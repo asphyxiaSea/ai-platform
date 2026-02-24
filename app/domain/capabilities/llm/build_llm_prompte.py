@@ -1,27 +1,28 @@
-from typing import Any, Iterable, Protocol
+from typing import Any, Iterable
 from pydantic import BaseModel
-from app.domain.templates.files_parse.config import FilesTaskConfig
-from app.domain.capabilities.llm.llm_config import DEFAULT_SYSTEM_PROMPT
 
-
-class HasLLMConfig(Protocol):
-    schema: type[BaseModel]
-    system_prompt: str
+DEFAULT_SYSTEM_PROMPT = """
+你是一个中文结构化信息抽取助手。
+严格按照给定 Schema 输出 JSON。
+不要输出 Schema 未定义的字段。
+不要输出任何解释性文字。
+""".strip()
 
 
 def build_ollama_messages(
     *,
-    taskconfig: HasLLMConfig,
+    schema: type[BaseModel],
+    system_prompt: str | None,
     text: str,
     image_base64_list: Iterable[str] | None = None,
 ) -> list[dict[str, Any]]:
     field_prompts = "\n".join(
         f"- {name}: {field.description}"
-        for name, field in taskconfig.schema.model_fields.items()
+        for name, field in schema.model_fields.items()
         if field.description
     )
 
-    task_description = (taskconfig.system_prompt or DEFAULT_SYSTEM_PROMPT).strip()
+    task_description = (system_prompt or DEFAULT_SYSTEM_PROMPT).strip()
 
     system_prompt = f"""
 【任务说明】
@@ -44,13 +45,17 @@ def build_ollama_messages(
 
 def build_openai_messages(
     *,
-    taskconfig: FilesTaskConfig,
+    schema: type[BaseModel],
+    system_prompt: str | None,
     text: str,
 ) -> list[dict[str, str]]:
+    resolved_system_prompt = (
+        system_prompt or schema.__doc__ or DEFAULT_SYSTEM_PROMPT
+    ).strip()
     messages = [
         {
             "role": "system",
-            "content": (taskconfig.schema.__doc__ or "").strip(),
+            "content": resolved_system_prompt,
         },
         {
             "role": "user",

@@ -2,10 +2,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Type
 from pydantic import BaseModel
-from app.domain.capabilities.llm.llm_config import (
-    DEFAULT_SYSTEM_PROMPT,
-    LLMConfig,
-)
+from app.domain.capabilities.llm.llm_config import LLMConfig
+from app.domain.capabilities.llm.build_llm_prompte import DEFAULT_SYSTEM_PROMPT
 
 
 class LLMTaskMode(str, Enum):
@@ -17,7 +15,7 @@ class LLMTaskMode(str, Enum):
 class LLMTaskConfig:
     schema: Type[BaseModel]
     task_mode: LLMTaskMode = LLMTaskMode.CHAT
-    system_prompt: str = DEFAULT_SYSTEM_PROMPT
+    system_prompt: str | None = None
     user_prompt: str = ""
 
     llm: LLMConfig = field(default_factory=LLMConfig)
@@ -31,8 +29,6 @@ def LLMTaskConfig_factory(
     task_mode: LLMTaskMode = LLMTaskMode.CHAT,
 ) -> LLMTaskConfig:
     """构建 LLMTaskConfig（仅覆盖需要的字段）"""
-    if system_prompt is None:
-        system_prompt = DEFAULT_SYSTEM_PROMPT
     llm = LLMConfig()
     return LLMTaskConfig(
         schema=schema,

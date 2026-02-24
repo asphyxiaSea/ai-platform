@@ -11,7 +11,8 @@ class LLMExtractStep:
         results = []
         for text in context.get_output("texts", []):
             messages = build_ollama_messages(
-                taskconfig=self.config,
+                schema=self.config.schema,
+                system_prompt=self.config.system_prompt,
                 text=text,
             )
             result = await structured_output(
