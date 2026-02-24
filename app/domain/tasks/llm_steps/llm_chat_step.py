@@ -15,9 +15,10 @@ class LLMChatStep:
             text=self._config.text,
         )
         model = self._config.llm.model
-        context.result = await structured_output(
+        result = await structured_output(
             model=model,
             schema=self._config.schema,
             messages=messages,
             temperature=self._config.llm.temperature,
         )
+        context.result = {"results": [result]}

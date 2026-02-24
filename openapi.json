@@ -69,8 +69,8 @@
     },
     "/ai-platform/llm/structure": {
       "post": {
-        "operationId": "LLMStructureParse",
-        "summary": "输入文本调用模型推理，输出结构化信息。",
+        "operationId": "LLMMultimodalStructure",
+        "summary": "输入文本调用多模态模型推理，输出结构化信息。",
         "requestBody": {
           "required": true,
           "content": {
