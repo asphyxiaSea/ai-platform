@@ -21,7 +21,7 @@
             "multipart/form-data": {
               "schema": {
                 "type": "object",
-                "required": ["schema","files"],
+                "required": ["schema_payload_json","files"],
                 "properties": {
                   "system_prompt": {
                     "type": "string"
@@ -36,6 +36,59 @@
                     "type": "string"
                   },
                 "files": {
+                    "type": "array",
+                    "items":{
+                       "type": "string",
+                       "format": "binary"
+                     }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "模型回复",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "content": {
+                      "type": "object",
+                      "additionalProperties": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai-platform/llm/structure": {
+      "post": {
+        "operationId": "LLMStructureParse",
+        "summary": "输入文本调用模型推理，输出结构化信息。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": ["schema_payload_json","text"],
+                "properties": {
+                  "system_prompt": {
+                    "type": "string"
+                  },
+                  "schema_payload_json": {
+                    "type": "string"
+                  },
+                  "text": {
+                    "type": "string"
+                  },
+                "image_files": {
                     "type": "array",
                     "items":{
                        "type": "string",

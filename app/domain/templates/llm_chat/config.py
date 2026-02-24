@@ -15,6 +15,6 @@ class LLMTaskConfig:
     schema: Type[BaseModel]
     task_mode: LLMTaskMode = LLMTaskMode.CHAT
     system_prompt: str | None = None
-    user_prompt: str = ""
+    text: str = ""
 
     llm: LLMConfig = field(default_factory=LLMConfig)

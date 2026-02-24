@@ -12,7 +12,7 @@ router = APIRouter(prefix="/llm", tags=["llm"])
 @router.post("/structure")
 async def structure_parse(
     system_prompt: Optional[str] = Form(None),
-    user_prompt: str = Form(...),
+    text: str = Form(...),
     schema_payload_json: str = Form(...),
     image_files: Optional[List[UploadFile]] = File(None),
 ):
@@ -42,7 +42,7 @@ async def structure_parse(
     taskconfig = LLMTaskConfig(
         schema=schema_model,
         system_prompt=system_prompt,
-        user_prompt=user_prompt,
+        text=text,
         task_mode=task_mode,
     )
 

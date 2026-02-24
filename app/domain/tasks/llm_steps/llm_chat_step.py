@@ -12,7 +12,7 @@ class LLMChatStep:
         messages = build_ollama_messages(
             schema=self._config.schema,
             system_prompt=self._config.system_prompt,
-            text=self._config.user_prompt,
+            text=self._config.text,
         )
         model = self._config.llm.model
         context.result = await structured_output(
