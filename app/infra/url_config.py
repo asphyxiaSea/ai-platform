@@ -31,3 +31,8 @@ FUNASR_TRANSCRIBE_PATH_URL = os.environ.get(
 	"FUNASR_TRANSCRIBE_PATH_URL",
 	"http://localhost:8005/funasr/transcribe_path",
 )
+
+COSYVOICE_SYNTHESIZE_URL = os.environ.get(
+	"COSYVOICE_SYNTHESIZE_URL",
+	"http://localhost:8006/cosyvoice/synthesize",
+)
