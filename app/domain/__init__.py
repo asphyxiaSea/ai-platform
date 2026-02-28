@@ -4,15 +4,16 @@ from .errors import (
     InvalidRequestError,
     UnsupportedOperationError,
 )
-from .marker import (
+from .capabilities.marker import (
     DEFAULT_PROCESSORS,
     DEFAULT_PROCESSORS_NAME,
     Marker,
     filter_noisy,
 )
-from .resources.build_schema import get_schema_model
-from .resources.context import TaskContext
-from .resources.file_item import FileItem
+
+from .build_schema import get_schema_model
+from .context import TaskContext
+from .file_item import FileItem
 
 __all__ = [
     "AppError",

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Protocol, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from app.domain.resources.context import TaskContext
+    from app.domain.context import TaskContext
 
 
 class TaskStep(Protocol):

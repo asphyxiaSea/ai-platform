@@ -1,7 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, Form
 from typing import List, Optional
 from app.service.files_parse_service import files_parse_service
-from app.domain.resources.build_schema import get_schema_model
+from app.domain.build_schema import get_schema_model
 from app.domain.templates.files_parse.config import FilesTaskConfig
 from app.domain.errors import InvalidRequestError
 from app.util.file_utils import upload_file_to_item

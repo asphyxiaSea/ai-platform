@@ -1,5 +1,5 @@
 from app.domain.errors import InvalidRequestError
-from app.domain.resources.context import TaskContext
+from app.domain.context import TaskContext
 from app.domain.templates.voice_transcribe.config import VoiceTaskConfig
 from app.infra.funasr_client import funasr_transcribe
 

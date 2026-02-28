@@ -1,6 +1,6 @@
 import asyncio
 from app.domain.capabilities.process.pdf_preprocess import pdf_preprocess
-from app.domain.resources.file_item import FileItem
+from app.domain.file_item import FileItem
 
 
 class PdfPreprocessStep:

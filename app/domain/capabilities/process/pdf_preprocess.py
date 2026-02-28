@@ -1,7 +1,7 @@
 from io import BytesIO
 import re
 from pypdf import PdfReader, PdfWriter
-from app.domain.resources.file_item import FileItem
+from app.domain.file_item import FileItem
 
 
 def pdf_preprocess(

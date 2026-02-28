@@ -1,6 +1,6 @@
 from app.domain.templates.llm_chat.config import LLMTaskConfig
 from app.domain.capabilities.llm.build_llm_prompte import build_ollama_messages
-from app.domain.resources.context import TaskContext
+from app.domain.context import TaskContext
 from app.infra.llm_client import structured_output
 from app.util.pdf_utils import image_bytes_to_base64
 

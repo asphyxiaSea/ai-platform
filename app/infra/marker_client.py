@@ -1,7 +1,7 @@
 import json
 import httpx
-from app.domain.resources.file_item import FileItem
-from app.domain.marker import Marker, filter_noisy
+from app.domain.file_item import FileItem
+from app.domain.capabilities.marker import Marker, filter_noisy
 from app.domain.errors import ExternalServiceError, InvalidRequestError
 from app.infra.url_config import MARKER_EXTRACT_URL
 

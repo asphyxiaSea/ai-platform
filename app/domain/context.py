@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Any
-from app.domain.resources.file_item import FileItem
+from app.domain.file_item import FileItem
 
 
 @dataclass
