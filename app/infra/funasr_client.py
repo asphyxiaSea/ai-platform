@@ -3,7 +3,7 @@ from app.domain.errors import ExternalServiceError, InvalidRequestError
 from app.infra.url_config import FUNASR_TRANSCRIBE_PATH_URL
 
 
-async def transcribe(
+async def funasr_transcribe(
     *,
     file_path: str,
     model_key: str = "",

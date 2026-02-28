@@ -4,7 +4,7 @@ from app.domain.errors import ExternalServiceError, InvalidRequestError
 from app.infra.url_config import PADDLE_EXTRACT_PATH_URL
 
 
-async def extract_file(
+async def paddle_extract_file(
     *,
     file_item: FileItem,
 ) -> str:

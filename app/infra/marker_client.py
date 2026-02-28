@@ -6,7 +6,7 @@ from app.domain.errors import ExternalServiceError, InvalidRequestError
 from app.infra.url_config import MARKER_EXTRACT_URL
 
 
-async def extract_file(
+async def marker_extract_file(
     *,
     file_item: FileItem,
     marker: Marker | None = None,

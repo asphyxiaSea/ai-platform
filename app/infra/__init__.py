@@ -1,9 +1,9 @@
 """Infrastructure integrations (HTTP clients, LLM clients)."""
 
-from .funasr_client import transcribe as funasr_transcribe
+from .funasr_client import funasr_transcribe
 from .llm_client import DEFAULT_BACKEND, raw_output, structured_output
-from .marker_client import extract_file as marker_extract_file
-from .paddle_client import extract_file as paddle_extract_file
+from .marker_client import marker_extract_file
+from .paddle_client import paddle_extract_file
 from .url_config import (
 	COSYVOICE_SYNTHESIZE_URL,
 	FUNASR_TRANSCRIBE_PATH_URL,
