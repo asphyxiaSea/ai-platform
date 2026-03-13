@@ -13,6 +13,11 @@ OPENAI_LLM_URL = os.environ.get(
 	f"{_ollama_base}/v1",
 )
 
+SAM3_IMAGE_SEGMENT_TEXTS_URL = os.environ.get(
+	"SAM3_IMAGE_SEGMENT_TEXTS_URL",
+	"http://localhost:8002/sam3/image/segment/instance/texts",
+)
+
 PADDLE_EXTRACT_URL = os.environ.get(
 	"PADDLE_EXTRACT_URL",
 	"http://localhost:8003/paddle/pp-structurev3/predict",

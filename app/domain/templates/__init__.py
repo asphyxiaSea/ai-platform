@@ -2,6 +2,7 @@
 
 from .files_parse import FilesTaskConfig, build_files_parse_task
 from .llm_chat import LLMTaskConfig, LLMTaskMode, build_llm_task
+from .sam3 import Sam3TaskConfig, Sam3TaskConfig_factory, Sam3TaskMode, build_sam3_task
 from .voice_transcribe import (
 	VoiceTaskConfig,
 	VoiceTaskConfig_factory,
@@ -13,10 +14,14 @@ __all__ = [
 	"FilesTaskConfig",
 	"LLMTaskConfig",
 	"LLMTaskMode",
+	"Sam3TaskConfig",
+	"Sam3TaskConfig_factory",
+	"Sam3TaskMode",
 	"VoiceTaskConfig",
 	"VoiceTaskConfig_factory",
 	"VoiceTaskMode",
 	"build_files_parse_task",
 	"build_llm_task",
+	"build_sam3_task",
 	"build_voice_task",
 ]
