@@ -42,11 +42,28 @@ async def height_measure(
             detail=target_texts,
         )
 
+    ruler_real_height = reference_config_data.get("ruler_real_height")
+    if not isinstance(ruler_real_height, (int, float)):
+        raise InvalidRequestError(
+            message="reference_config.ruler_real_height must be a number",
+            detail=ruler_real_height,
+        )
+    if ruler_real_height <= 0:
+        raise InvalidRequestError(
+            message="reference_config.ruler_real_height must be > 0",
+            detail=ruler_real_height,
+        )
+
+    # 该字段仅用于本地高度换算，不应透传给 Sam3 外部分割服务。
+    reference_seg_config = dict(reference_config_data)
+    reference_seg_config.pop("ruler_real_height", None)
+
     uploaded = await upload_file_to_item(upload_file=image_file)
     try:
         taskconfig = Sam3TaskConfig_factory(
-            reference_config=reference_config_data,
+            reference_config=reference_seg_config,
             target_config=target_config_data,
+            ruler_real_height=float(ruler_real_height),
         )
         return await sam3_service(
             file_item=uploaded.item,
