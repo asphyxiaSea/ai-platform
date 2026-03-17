@@ -1,1 +1,1 @@
-"""Domain models and tools for langchain_app."""
+"""Domain models for structured extraction."""

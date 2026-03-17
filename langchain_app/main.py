@@ -1,30 +1,23 @@
-from pprint import pprint
+from __future__ import annotations
 
-from langchain_core.runnables import RunnableConfig
+import os
 
-from langchain_app import config
-from langchain_app.application.agent_factory import build_weather_agent
-from langchain_app.application.result_extractor import extract_agent_result
-from langchain_app.domain.schemas import Context
+import uvicorn
 
-
-def run() -> dict:
-    """Execute one weather-agent run and return extracted output."""
-    agent = build_weather_agent()
-    runnable_config: RunnableConfig = {
-        "configurable": {"thread_id": config.DEFAULT_THREAD_ID}
-    }
-
-    response = agent.invoke(
-        {"messages": [{"role": "user", "content": config.DEFAULT_USER_MESSAGE}]},
-        config=runnable_config,
-        context=Context(user_id=config.DEFAULT_USER_ID),
-    )
-    return extract_agent_result(response)
+from langchain_app.fastapi_app import app
 
 
 def main() -> None:
-    pprint(run())
+    host = os.environ.get("LANGCHAIN_APP_HOST", "0.0.0.0")
+    port = int(os.environ.get("LANGCHAIN_APP_PORT", "8010"))
+    reload = os.environ.get("LANGCHAIN_APP_RELOAD", "true").lower() == "true"
+
+    uvicorn.run(
+        "langchain_app.main:app",
+        host=host,
+        port=port,
+        reload=reload,
+    )
 
 
 if __name__ == "__main__":

@@ -1,1 +1,1 @@
-"""Infrastructure adapters for langchain_app."""
+"""Infrastructure adapters for external services."""

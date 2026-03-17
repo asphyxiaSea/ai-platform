@@ -1,1 +1,1 @@
-"""Application services and factories for langchain_app."""
+"""Application orchestration layer."""
