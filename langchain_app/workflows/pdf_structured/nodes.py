@@ -144,8 +144,8 @@ def _text_preprocess(full_text: str, target_sections: list[str] | None = None) -
 
 
 async def pdf_preprocess_node(state: PdfStructuredState) -> dict[str, str]:
-    preprocess = state.get("preprocess")
-    page_range = preprocess.get("page_range") if isinstance(preprocess, dict) else None
+    pdf_process = state.get("pdf_process")
+    page_range = pdf_process.get("page_range") if isinstance(pdf_process, dict) else None
     if not isinstance(page_range, str) or not page_range.strip():
         return {"pdf_path": state["pdf_path"]}
 
@@ -155,8 +155,20 @@ async def pdf_preprocess_node(state: PdfStructuredState) -> dict[str, str]:
 
 async def text_preprocess_node(state: PdfStructuredState) -> dict[str, str]:
     extracted_text = state.get("extracted_text", "")
-    target_sections = state.get("target_sections")
-    safe_target_sections = target_sections if isinstance(target_sections, list) else None
+    text_process = state.get("text_process")
+
+    safe_target_sections: list[str] | None = None
+    if isinstance(text_process, dict):
+        raw_target_sections = text_process.get("target_sections")
+        if isinstance(raw_target_sections, str) and raw_target_sections.strip():
+            safe_target_sections = [raw_target_sections.strip()]
+        elif isinstance(raw_target_sections, list):
+            safe_target_sections = [
+                item.strip() for item in raw_target_sections if isinstance(item, str) and item.strip()
+            ]
+            if not safe_target_sections:
+                safe_target_sections = None
+
     return {
         "extracted_text": _text_preprocess(
             full_text=extracted_text,
